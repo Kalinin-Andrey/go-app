@@ -24,15 +24,15 @@ func NewPostRepository(repository *repository) (*PostRepository, error) {
 
 
 // Get reads the album with the specified ID from the database.
-func (r PostRepository) Get(ctx context.Context, id uint) (*post.Entity, error) {
-	var entity post.Entity
+func (r PostRepository) Get(ctx context.Context, id uint) (*post.Post, error) {
+	var entity post.Post
 
 	r.dbWithDefaults().First(&entity, id)
 
 	return &entity, nil
 }
 
-func (r PostRepository) First(ctx context.Context, entity *post.Entity) (*post.Entity, error) {
+func (r PostRepository) First(ctx context.Context, entity *post.Post) (*post.Post, error) {
 	r.db.DB().Where(entity).First(entity)
 	if entity.ID == 0 {
 		return entity, apperror.ErrNotFound
@@ -41,25 +41,41 @@ func (r PostRepository) First(ctx context.Context, entity *post.Entity) (*post.E
 }
 
 // Query retrieves the album records with the specified offset and limit from the database.
-func (r PostRepository) Query(ctx context.Context, offset, limit uint) ([]post.Entity, error) {
-	var items []post.Entity
+func (r PostRepository) Query(ctx context.Context, offset, limit uint) ([]post.Post, error) {
+	var items []post.Post
 
-	r.dbWithDefaults().Find(&items)
+	r.dbWithContext(ctx, r.dbWithDefaults()).Find(&items)
 
 	return items, nil
 }
 
 // Create saves a new album record in the database.
 // It returns the ID of the newly inserted album record.
-func (r PostRepository) Create(ctx context.Context, entity *post.Entity) error {
+func (r PostRepository) Create(ctx context.Context, entity *post.Post) error {
 
 	if !r.db.DB().NewRecord(entity) {
 		return errors.New("entity is not new")
 	}
 
-	if err := r.db.DB().Create(entity).Error; err != nil {
+	return r.db.DB().Create(entity).Error
+}
+
+func (r PostRepository) Update(ctx context.Context, entity *post.Post) error {
+
+	if r.db.DB().NewRecord(entity) {
+		return errors.New("entity is new")
+	}
+
+	return r.db.DB().Save(entity).Error
+}
+
+// Delete deletes an entity with the specified ID from the database.
+func (r PostRepository) Delete(ctx context.Context, id uint) error {
+	entity, err := r.Get(ctx, id)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	return r.db.DB().Delete(entity).Error
 }
+

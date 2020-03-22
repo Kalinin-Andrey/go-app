@@ -23,7 +23,7 @@ type Service interface {
 	// It returns a JWT token if authentication succeeds. Otherwise, an error is returned.
 	Login(ctx context.Context, username, password string) (string, error)
 	Register(ctx context.Context, username, password string) (string, error)
-	NewUser(username, password string) (*user.Entity, error)
+	NewUser(username, password string) (*user.User, error)
 }
 
 // Identity represents an authenticated user identity.
@@ -54,7 +54,7 @@ func NewService(signingKey string, tokenExpiration int, userService user.IServic
 	return service{signingKey, tokenExpiration, userService, logger}
 }
 
-func (s service) NewUser(username, password string) (*user.Entity, error) {
+func (s service) NewUser(username, password string) (*user.User, error) {
 	user := s.userService.NewEntity()
 	user.Name = username
 
@@ -78,8 +78,8 @@ func (s service) Login(ctx context.Context, username, password string) (string, 
 }
 
 // authenticate authenticates a user using username and password.
-// If username and password are correct, an *user.Entity is returned. Otherwise, error is returned.
-func (s service) authenticate(ctx context.Context, username, password string) (*user.Entity, error) {
+// If username and password are correct, an *user.User is returned. Otherwise, error is returned.
+func (s service) authenticate(ctx context.Context, username, password string) (*user.User, error) {
 	logger := s.logger.With(ctx, "user", username)
 
 	user := s.userService.NewEntity()
@@ -100,7 +100,7 @@ func (s service) authenticate(ctx context.Context, username, password string) (*
 }
 
 // generateJWT generates a JWT that encodes an identity.
-func (s service) generateJWT(user *user.Entity) (string, error) {
+func (s service) generateJWT(user *user.User) (string, error) {
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":   user.ID,
 		"name": user.Name,

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 
@@ -69,3 +70,20 @@ func (r repository) dbWithDefaults() *gorm.DB {
 	return db
 }
 
+
+func (r repository) dbWithContext(ctx context.Context, db *gorm.DB) *gorm.DB {
+
+	if where := ctx.Value("Where"); where != nil {
+		db = db.Where(where)
+	}
+
+	if order := ctx.Value("SortOrder"); order != nil {
+		db = db.Order(order)
+	}
+
+	if limit := ctx.Value("Limit"); limit != nil {
+		db = db.Limit(limit)
+	}
+
+	return db
+}

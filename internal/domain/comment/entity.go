@@ -10,13 +10,14 @@ const (
 	TableName	= "comment"
 )
 
-// Entity is the user entity
-type Entity struct {
-	ID				uint			`gorm:"PRIMARY_KEY" json:"id"`
-	PostID			uint			`gorm:"" json:"postId"`
-	UserID			uint			`gorm:"" json:"userId"`
-	User			*user.Entity	`gorm:"EMBEDDED" json:"author"`
-	Body			string			`json:"body"`
+// Comment is the user entity
+type Comment struct {
+	ID				uint     `gorm:"PRIMARY_KEY" json:"id"`
+	PostID			uint     `sql:"type:int REFERENCES post(id)" json:"postId"`
+	UserID			uint     `sql:"type:int REFERENCES \"user\"(id)" json:"userId"`
+	User			*user.User `gorm:"FOREIGNKEY:UserID" json:"author"`
+	Post			*user.User `gorm:"FOREIGNKEY:PostID;PRELOAD:false" json:"author"`
+	Body			string     `json:"body"`
 
 	CreatedAt		time.Time		`json:"created"`
 	UpdatedAt		time.Time		`json:"updated"`
@@ -24,12 +25,12 @@ type Entity struct {
 }
 
 
-func (e Entity) TableName() string {
+func (e Comment) TableName() string {
 	return TableName
 }
 
-// New func is a constructor for the Entity
-func New() *Entity {
-	return &Entity{}
+// New func is a constructor for the Comment
+func New() *Comment {
+	return &Comment{}
 }
 

@@ -7,11 +7,10 @@ import (
 
 const TableName = "user"
 
-// Entity is the user entity
-type Entity struct {
+// User is the user entity
+type User struct {
 	ID				uint		`gorm:"PRIMARY_KEY" json:"id"`
 	Name			string		`gorm:"type:varchar(100);UNIQUE;INDEX" json:"username"`
-	//Salt			string		`gorm:"type:varchar(100)" json:"-"`
 	Passhash		string		`gorm:"type:bytea" json:"-"`
 	CreatedAt		time.Time
 	UpdatedAt		time.Time
@@ -19,20 +18,20 @@ type Entity struct {
 }
 
 
-func (e Entity) TableName() string {
+func (e User) TableName() string {
 	return TableName
 }
 
-// New func is a constructor for the Entity
-func New() *Entity {
-	return &Entity{}
+// New func is a constructor for the User
+func New() *User {
+	return &User{}
 }
 
-func (e Entity) GetID() string {
+func (e User) GetID() string {
 	return strconv.Itoa(int(e.ID))
 }
 
 
-func (e Entity) GetName() string {
+func (e User) GetName() string {
 	return e.Name
 }

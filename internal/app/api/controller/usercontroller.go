@@ -1,7 +1,7 @@
 package controller
 
 import (
-
+	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
 	"github.com/go-ozzo/ozzo-routing/v2"
 	"github.com/pkg/errors"
 	"strconv"
@@ -16,7 +16,7 @@ type userController struct {
 }
 
 // RegisterHandlers sets up the routing of the HTTP handlers.
-func RegisterUserHandlers(r *routing.RouteGroup, service user.IService, logger log.ILogger) {
+func RegisterUserHandlers(r *routing.RouteGroup, service user.IService, logger log.ILogger, authHandler routing.Handler) {
 	c := userController{
 		Service:	service,
 		Logger:		logger,
@@ -28,27 +28,30 @@ func RegisterUserHandlers(r *routing.RouteGroup, service user.IService, logger l
 }
 
 // get method is for a getting a one enmtity by ID
-func (c userController) get(context *routing.Context) error {
-	id, err := strconv.ParseUint(context.Param("id"), 10, 64)
+func (c userController) get(ctx *routing.Context) error {
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
-		return errors.Wrapf(err, "Can not parse uint64 from %q", context.Param("id"))
+		c.Logger.With(ctx.Request.Context()).Info(errors.Wrapf(err, "Can not parse uint64 from %q", ctx.Param("id")))
+		return errorshandler.BadRequest("")
 	}
-	entity, err := c.Service.Get(context.Request.Context(), uint(id))
+	entity, err := c.Service.Get(ctx.Request.Context(), uint(id))
 	if err != nil {
-		return err
+		c.Logger.With(ctx.Request.Context()).Info(err)
+		return errorshandler.NotFound("")
 	}
-	context.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	return context.Write(entity)
+	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	return ctx.Write(entity)
 }
 
 // list method is for a getting a list of all entities
-func (c userController) list(context *routing.Context) error {
-	ctx := context.Request.Context()
-	items, err := c.Service.List(ctx)
+func (c userController) list(ctx *routing.Context) error {
+	rctx := ctx.Request.Context()
+	items, err := c.Service.List(rctx)
 	if err != nil {
-		return err
+		c.Logger.With(ctx.Request.Context()).Info(err)
+		return errorshandler.InternalServerError("")
 	}
-	context.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	return context.Write(items)
+	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	return ctx.Write(items)
 }
 

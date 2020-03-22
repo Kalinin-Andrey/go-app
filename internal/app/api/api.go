@@ -59,22 +59,25 @@ func (app *App) buildHandler() *routing.Router {
 
 	// serve index file
 	router.Get("/", file.Content("website/index.html"))
+	router.Get("/", file.Content("website/favicon.ico"))
+	router.Get("/", file.Content("website/manifest.json"))
 	// serve files under the "ui" subdirectory
-	router.Get("/*", file.Server(file.PathMap{
-		"/": "/website/",
+	router.Get("/css/*", file.Server(file.PathMap{
+		"/css/": "/website/css/",
+	}))
+	router.Get("/js/*", file.Server(file.PathMap{
+		"/js/": "/website/js/",
 	}))
 	rg := router.Group("/api")
 
-	authHandler := auth.Handler(app.Cfg.JWTSigningKey)
+	authHandler := auth.Handler(app.Cfg.JWTSigningKey, app.DB, app.Logger, app.Domain.User.Repository)
 
 	auth.RegisterHandlers(rg.Group(""),
 		auth.NewService(app.Cfg.JWTSigningKey, app.Cfg.JWTExpiration, app.Domain.User.Service, app.Logger),
 		app.Logger,
 	)
 
-	rg.Use(authHandler)
-
-	app.RegisterHandlers(rg)
+	app.RegisterHandlers(rg, authHandler)
 
 	return 	router
 }
@@ -103,9 +106,10 @@ func (app *App) Run() error {
 }
 
 // RegisterHandlers sets up the routing of the HTTP handlers.
-func (app *App) RegisterHandlers(rg *routing.RouteGroup) {
+func (app *App) RegisterHandlers(rg *routing.RouteGroup, authHandler routing.Handler) {
 
-	controller.RegisterUserHandlers(rg, app.Domain.User.Service, app.Logger)
+	//controller.RegisterUserHandlers(rg, app.Domain.User.Service, app.Logger, authHandler)
+	controller.RegisterPostHandlers(rg, app.Domain.Post.Service, app.Domain.User.Service, app.Logger, authHandler)
 
 
 }

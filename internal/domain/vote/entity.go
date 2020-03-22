@@ -10,13 +10,14 @@ const (
 	TableName	= "vote"
 )
 
-// Entity is the user entity
-type Entity struct {
-	ID				uint		`gorm:"PRIMARY_KEY" json:"id"`
-	PostID			uint			`gorm:"" json:"postId"`
-	UserID			uint			`gorm:"" json:"user"`
-	User			*user.Entity	`gorm:"" json:"author"`
-	Value			int			`json:"vote"`
+// Vote is the user entity
+type Vote struct {
+	ID				uint     `gorm:"PRIMARY_KEY" json:"id"`
+	PostID			uint     `sql:"type:int REFERENCES post(id)" json:"postId"`
+	UserID			uint     `sql:"type:int REFERENCES \"user\"(id)" json:"user"`
+	User			*user.User `gorm:"FOREIGNKEY:UserID" json:"author"`
+	Post			*user.User `gorm:"FOREIGNKEY:PostID;PRELOAD:false" json:"author"`
+	Value			int       `json:"vote"`
 
 	CreatedAt		time.Time		`json:"created"`
 	UpdatedAt		time.Time		`json:"updated"`
@@ -24,12 +25,12 @@ type Entity struct {
 }
 
 
-func (e Entity) TableName() string {
+func (e Vote) TableName() string {
 	return TableName
 }
 
-// New func is a constructor for the Entity
-func New() *Entity {
-	return &Entity{}
+// New func is a constructor for the Vote
+func New() *Vote {
+	return &Vote{}
 }
 

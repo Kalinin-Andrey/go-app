@@ -36,6 +36,8 @@ func New(conf config.DB, logger log.ILogger) (*DB, error) {
 	db.SetLogger(logger)
 	// Enable Logger, show detailed log
 	db.LogMode(true)
+	// Enable auto preload embeded entities
+	db = 	db.Set("gorm:auto_preload", true)
 
 	dbobj := &DB{db: db}
 	dbobj.AutoMigrateAll()

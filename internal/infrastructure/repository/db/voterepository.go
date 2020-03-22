@@ -24,15 +24,15 @@ func NewVoteRepository(repository *repository) (*VoteRepository, error) {
 
 
 // Get reads the album with the specified ID from the database.
-func (r VoteRepository) Get(ctx context.Context, id uint) (*vote.Entity, error) {
-	var entity vote.Entity
+func (r VoteRepository) Get(ctx context.Context, id uint) (*vote.Vote, error) {
+	var entity vote.Vote
 
 	r.dbWithDefaults().First(&entity, id)
 
 	return &entity, nil
 }
 
-func (r VoteRepository) First(ctx context.Context, entity *vote.Entity) (*vote.Entity, error) {
+func (r VoteRepository) First(ctx context.Context, entity *vote.Vote) (*vote.Vote, error) {
 	r.db.DB().Where(entity).First(entity)
 	if entity.ID == 0 {
 		return entity, apperror.ErrNotFound
@@ -41,17 +41,17 @@ func (r VoteRepository) First(ctx context.Context, entity *vote.Entity) (*vote.E
 }
 
 // Query retrieves the album records with the specified offset and limit from the database.
-func (r VoteRepository) Query(ctx context.Context, offset, limit uint) ([]vote.Entity, error) {
-	var items []vote.Entity
+func (r VoteRepository) Query(ctx context.Context, offset, limit uint) ([]vote.Vote, error) {
+	var items []vote.Vote
 
-	r.dbWithDefaults().Find(&items)
+	r.dbWithContext(ctx, r.dbWithDefaults()).Find(&items)
 
 	return items, nil
 }
 
 // Create saves a new album record in the database.
 // It returns the ID of the newly inserted album record.
-func (r VoteRepository) Create(ctx context.Context, entity *vote.Entity) error {
+func (r VoteRepository) Create(ctx context.Context, entity *vote.Vote) error {
 
 	if !r.db.DB().NewRecord(entity) {
 		return errors.New("entity is not new")

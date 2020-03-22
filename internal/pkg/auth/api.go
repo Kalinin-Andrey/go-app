@@ -4,9 +4,12 @@ import (
 	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 	routing "github.com/go-ozzo/ozzo-routing/v2"
+	"net/http"
 )
 
 // RegisterHandlers registers handlers for different HTTP requests.
+//	POST /api/register - регистрация
+//	POST /api/login - логин
 func RegisterHandlers(rg *routing.RouteGroup, service Service, logger log.ILogger) {
 	rg.Post("/login", login(service, logger))
 	rg.Post("/register", register(service, logger))
@@ -32,9 +35,9 @@ func register(service Service, logger log.ILogger) routing.Handler {
 			}
 			return err
 		}
-		return c.Write(struct {
+		return c.WriteWithStatus(struct {
 			Token string `json:"token"`
-		}{token})
+		}{token}, http.StatusCreated)
 	}
 }
 

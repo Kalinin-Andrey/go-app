@@ -34,8 +34,8 @@ var Categories []string = []string{
 	CategoryFashion,
 }
 
-// Entity is the user entity
-type Entity struct {
+// Post is the user entity
+type Post struct {
 	ID				uint		`gorm:"PRIMARY_KEY" json:"id"`
 	Score			uint		`json:"score"`
 	Views			uint		`json:"views"`
@@ -45,11 +45,11 @@ type Entity struct {
 	Text			string		`json:"text,omitempty"`
 	Link			string		`gorm:"type:varchar(100)" json:"link,omitempty"`
 
-	UserID			uint			`json:"userId"`
-	User			*user.Entity	`gorm:"EMBEDDED" json:"author"`
+	UserID			uint     	`sql:"type:int REFERENCES \"user\"(id)" json:"userId"`
+	User			user.User	`gorm:"FOREIGNKEY:UserID" json:"author"`
 
-	Votes			[]vote.Entity	`gorm:"EMBEDDED" json:"votes"`
-	Comments		[]comment.Entity	`gorm:"EMBEDDED" json:"comments"`
+	Votes			[]vote.Vote      `gorm:"FOREIGNKEY:PostID" json:"votes"`
+	Comments		[]comment.Comment `gorm:"FOREIGNKEY:PostID" json:"comments"`
 
 	CreatedAt		time.Time		`json:"created"`
 	UpdatedAt		time.Time		`json:"updated"`
@@ -57,12 +57,12 @@ type Entity struct {
 }
 
 
-func (e Entity) TableName() string {
+func (e Post) TableName() string {
 	return TableName
 }
 
-// New func is a constructor for the Entity
-func New() *Entity {
-	return &Entity{}
+// New func is a constructor for the Post
+func New() *Post {
+	return &Post{}
 }
 

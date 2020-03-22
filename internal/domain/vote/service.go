@@ -9,15 +9,15 @@ const MaxLIstLimit = 1000
 
 // IService encapsulates usecase logic for user.
 type IService interface {
-	NewEntity() *Entity
-	Get(ctx context.Context, id uint) (*Entity, error)
-	Query(ctx context.Context, offset, limit uint) ([]Entity, error)
-	List(ctx context.Context) ([]Entity, error)
+	NewEntity() *Vote
+	Get(ctx context.Context, id uint) (*Vote, error)
+	Query(ctx context.Context, offset, limit uint) ([]Vote, error)
+	List(ctx context.Context) ([]Vote, error)
 	//Count(ctx context.Context) (uint, error)
-	Create(ctx context.Context, entity *Entity) error
-	//Update(ctx context.Context, id string, input *Entity) (*Entity, error)
+	Create(ctx context.Context, entity *Vote) error
+	//Update(ctx context.Context, id string, input *Vote) (*Vote, error)
 	//Delete(ctx context.Context, id string) (error)
-	First(ctx context.Context, user *Entity) (*Entity, error)
+	First(ctx context.Context, user *Vote) (*Vote, error)
 }
 
 type service struct {
@@ -39,12 +39,12 @@ func (s service) defaultConditions() map[string]interface{} {
 	}
 }
 
-func (s service) NewEntity() *Entity {
-	return &Entity{}
+func (s service) NewEntity() *Vote {
+	return &Vote{}
 }
 
 // Get returns the entity with the specified ID.
-func (s service) Get(ctx context.Context, id uint) (*Entity, error) {
+func (s service) Get(ctx context.Context, id uint) (*Vote, error) {
 	entity, err := s.repo.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (s service) Count(ctx context.Context) (uint, error) {
 }*/
 
 // Query returns the items with the specified offset and limit.
-func (s service) Query(ctx context.Context, offset, limit uint) ([]Entity, error) {
+func (s service) Query(ctx context.Context, offset, limit uint) ([]Vote, error) {
 	items, err := s.repo.Query(ctx, offset, limit)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (s service) Query(ctx context.Context, offset, limit uint) ([]Entity, error
 }
 
 // List returns the items list.
-func (s service) List(ctx context.Context) ([]Entity, error) {
+func (s service) List(ctx context.Context) ([]Vote, error) {
 	items, err := s.repo.Query(ctx, 0, MaxLIstLimit)
 	if err != nil {
 		return nil, err
@@ -75,10 +75,10 @@ func (s service) List(ctx context.Context) ([]Entity, error) {
 	return items, nil
 }
 
-func (s service) Create(ctx context.Context, entity *Entity) error {
+func (s service) Create(ctx context.Context, entity *Vote) error {
 	return s.repo.Create(ctx, entity)
 }
 
-func (s service) First(ctx context.Context, user *Entity) (*Entity, error) {
+func (s service) First(ctx context.Context, user *Vote) (*Vote, error) {
 	return s.repo.First(ctx, user)
 }
