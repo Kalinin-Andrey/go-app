@@ -3,6 +3,7 @@ package post
 import (
 	"context"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
+	"github.com/pkg/errors"
 )
 
 const MaxLIstLimit = 1000
@@ -48,7 +49,7 @@ func (s service) NewEntity() *Post {
 func (s service) Get(ctx context.Context, id uint) (*Post, error) {
 	entity, err := s.repo.Get(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not get a post by id: %v", id)
 	}
 	return entity, nil
 }
@@ -62,7 +63,7 @@ func (s service) Count(ctx context.Context) (uint, error) {
 func (s service) Query(ctx context.Context, offset, limit uint) ([]Post, error) {
 	items, err := s.repo.Query(ctx, offset, limit)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not find a list of posts by ctx")
 	}
 	return items, nil
 }
@@ -72,7 +73,7 @@ func (s service) Query(ctx context.Context, offset, limit uint) ([]Post, error) 
 func (s service) List(ctx context.Context) ([]Post, error) {
 	items, err := s.repo.Query(ctx, 0, MaxLIstLimit)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not find a list of posts by ctx")
 	}
 	return items, nil
 }
@@ -90,6 +91,6 @@ func (s service) First(ctx context.Context, user *Post) (*Post, error) {
 	return s.repo.First(ctx, user)
 }
 
-func (s service) Delete(ctx context.Context, id uint) (error) {
+func (s service) Delete(ctx context.Context, id uint) error {
 	return s.repo.Delete(ctx, id)
 }

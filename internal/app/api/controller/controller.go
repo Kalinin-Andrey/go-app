@@ -1,10 +1,23 @@
 package controller
 
-import routing "github.com/go-ozzo/ozzo-routing/v2"
+import (
+	routing "github.com/go-ozzo/ozzo-routing/v2"
+	"strconv"
+)
 
 type IService interface {}
 
 type Controller struct {
+}
+
+
+func (c voteController) parseUint(ctx *routing.Context, paramName string) (uint, error) {
+	paramVal, err := strconv.ParseUint(ctx.Param(paramName), 10, 64)
+	if err != nil {
+		c.Logger.With(ctx.Request.Context()).Info(err)
+		return 0, err
+	}
+	return uint(paramVal), nil
 }
 
 

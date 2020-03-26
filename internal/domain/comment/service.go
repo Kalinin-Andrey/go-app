@@ -3,6 +3,7 @@ package comment
 import (
 	"context"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
+	"github.com/pkg/errors"
 )
 
 const MaxLIstLimit = 1000
@@ -16,7 +17,7 @@ type IService interface {
 	//Count(ctx context.Context) (uint, error)
 	Create(ctx context.Context, entity *Comment) error
 	//Update(ctx context.Context, id string, input *Comment) (*Comment, error)
-	//Delete(ctx context.Context, id string) (error)
+	Delete(ctx context.Context, id uint) (error)
 	First(ctx context.Context, user *Comment) (*Comment, error)
 }
 
@@ -47,7 +48,7 @@ func (s service) NewEntity() *Comment {
 func (s service) Get(ctx context.Context, id uint) (*Comment, error) {
 	entity, err := s.repo.Get(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not get a comment by id: %v", id)
 	}
 	return entity, nil
 }
@@ -61,7 +62,7 @@ func (s service) Count(ctx context.Context) (uint, error) {
 func (s service) Query(ctx context.Context, offset, limit uint) ([]Comment, error) {
 	items, err := s.repo.Query(ctx, offset, limit)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not find a list of comments by ctx")
 	}
 	return items, nil
 }
@@ -70,7 +71,7 @@ func (s service) Query(ctx context.Context, offset, limit uint) ([]Comment, erro
 func (s service) List(ctx context.Context) ([]Comment, error) {
 	items, err := s.repo.Query(ctx, 0, MaxLIstLimit)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not find a list of comments by ctx")
 	}
 	return items, nil
 }
@@ -81,4 +82,8 @@ func (s service) Create(ctx context.Context, entity *Comment) error {
 
 func (s service) First(ctx context.Context, user *Comment) (*Comment, error) {
 	return s.repo.First(ctx, user)
+}
+
+func (s service) Delete(ctx context.Context, id uint) error {
+	return s.repo.Delete(ctx, id)
 }

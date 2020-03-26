@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
 	dbrep "github.com/Kalinin-Andrey/redditclone/internal/infrastructure/repository/db"
-	"github.com/Kalinin-Andrey/redditclone/pkg/db"
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 	"github.com/dgrijalva/jwt-go"
 	routing "github.com/go-ozzo/ozzo-routing/v2"

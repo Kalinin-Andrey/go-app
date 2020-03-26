@@ -5,7 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 
-	"github.com/Kalinin-Andrey/redditclone/pkg/db"
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 )
 
@@ -14,9 +14,9 @@ type IRepository interface {}
 
 // repository persists albums in database
 type repository struct {
-	db     db.IDB
-	logger log.ILogger
-	defaultConditions	map[string]interface{}
+	db                db.IDB
+	logger            log.ILogger
+	defaultConditions map[string]interface{}
 }
 
 const Limit = 100

@@ -6,8 +6,8 @@ import (
 	"github.com/Kalinin-Andrey/redditclone/internal/domain/vote"
 	golog "log"
 
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
 	"github.com/Kalinin-Andrey/redditclone/pkg/config"
-	"github.com/Kalinin-Andrey/redditclone/pkg/db"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 
 	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
@@ -16,10 +16,10 @@ import (
 
 // App struct is the common part of all applications
 type App struct {
-	Cfg     config.Configuration
-	Logger  log.ILogger
-	DB      db.IDB
-	Domain	Domain
+	Cfg    config.Configuration
+	Logger log.ILogger
+	DB     db.IDB
+	Domain Domain
 }
 
 // Domain is a Domain Layer Entry Point

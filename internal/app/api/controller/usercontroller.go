@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/apperror"
 	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
 	"github.com/go-ozzo/ozzo-routing/v2"
 	"github.com/pkg/errors"
@@ -32,12 +33,16 @@ func (c userController) get(ctx *routing.Context) error {
 	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(errors.Wrapf(err, "Can not parse uint64 from %q", ctx.Param("id")))
-		return errorshandler.BadRequest("")
+		return errorshandler.BadRequest("id mast be a uint")
 	}
 	entity, err := c.Service.Get(ctx.Request.Context(), uint(id))
 	if err != nil {
-		c.Logger.With(ctx.Request.Context()).Info(err)
-		return errorshandler.NotFound("")
+		if err == apperror.ErrNotFound {
+			c.Logger.With(ctx.Request.Context()).Info(err)
+			return errorshandler.NotFound("")
+		}
+		c.Logger.With(ctx.Request.Context()).Error(err)
+		return errorshandler.InternalServerError("")
 	}
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return ctx.Write(entity)
@@ -48,7 +53,11 @@ func (c userController) list(ctx *routing.Context) error {
 	rctx := ctx.Request.Context()
 	items, err := c.Service.List(rctx)
 	if err != nil {
-		c.Logger.With(ctx.Request.Context()).Info(err)
+		if err == apperror.ErrNotFound {
+			c.Logger.With(ctx.Request.Context()).Info(err)
+			return errorshandler.NotFound("")
+		}
+		c.Logger.With(ctx.Request.Context()).Error(err)
 		return errorshandler.InternalServerError("")
 	}
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")

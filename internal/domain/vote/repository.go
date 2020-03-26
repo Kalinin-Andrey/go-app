@@ -16,9 +16,9 @@ type IRepository interface {
 	// Create saves a new album in the storage.
 	Create(ctx context.Context, entity *Vote) error
 	// Update updates the album with given ID in the storage.
-	//Update(ctx context.Context, entity *Vote) error
+	Update(ctx context.Context, entity *Vote) error
 	// Delete removes the album with given ID from the storage.
-	//Delete(ctx context.Context, id uint) error
+	Delete(ctx context.Context, entity *Vote) error
 	First(ctx context.Context, user *Vote) (*Vote, error)
 }
 

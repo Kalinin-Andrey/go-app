@@ -25,33 +25,38 @@ func NewUserRepository(repository *repository) (*UserRepository, error) {
 
 // Get reads the album with the specified ID from the database.
 func (r UserRepository) Get(ctx context.Context, id uint) (*user.User, error) {
-	var item user.User
+	entity := &user.User{}
 
-	r.dbWithDefaults().First(&item, id)
-
-	return &item, nil
-}
-
-func (r UserRepository) First(ctx context.Context, entity *user.User) (*user.User, error) {
-	err := r.db.DB().Where(entity).First(entity).Error
-
+	err := r.dbWithDefaults().First(entity, id).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return entity, apperror.ErrNotFound
 		}
-		r.logger.With(ctx).Error(err)
-		return entity, apperror.ErrInternal
 	}
-	return entity, nil
+	return entity, err
+}
+
+func (r UserRepository) First(ctx context.Context, entity *user.User) (*user.User, error) {
+	err := r.db.DB().Where(entity).First(entity).Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return entity, apperror.ErrNotFound
+		}
+	}
+	return entity, err
 }
 
 // Query retrieves the album records with the specified offset and limit from the database.
 func (r UserRepository) Query(ctx context.Context, offset, limit uint) ([]user.User, error) {
-	var items []user.User
+	items := []user.User{}
 
-	r.dbWithContext(ctx, r.dbWithDefaults()).Find(&items)
-
-	return items, nil
+	err := r.dbWithContext(ctx, r.dbWithDefaults()).Find(&items).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return items, apperror.ErrNotFound
+		}
+	}
+	return items, err
 }
 
 // Create saves a new album record in the database.
@@ -61,10 +66,5 @@ func (r UserRepository) Create(ctx context.Context, entity *user.User) error {
 	if !r.db.DB().NewRecord(entity) {
 		return errors.New("entity is not new")
 	}
-
-	if err := r.db.DB().Create(entity).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return r.db.DB().Create(entity).Error
 }

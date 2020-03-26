@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"github.com/jinzhu/gorm"
 
 	"github.com/pkg/errors"
 
@@ -25,28 +26,38 @@ func NewPostRepository(repository *repository) (*PostRepository, error) {
 
 // Get reads the album with the specified ID from the database.
 func (r PostRepository) Get(ctx context.Context, id uint) (*post.Post, error) {
-	var entity post.Post
+	entity := &post.Post{}
 
-	r.dbWithDefaults().First(&entity, id)
-
-	return &entity, nil
+	err := r.dbWithDefaults().First(&entity, id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return entity, apperror.ErrNotFound
+		}
+	}
+	return entity, err
 }
 
 func (r PostRepository) First(ctx context.Context, entity *post.Post) (*post.Post, error) {
-	r.db.DB().Where(entity).First(entity)
-	if entity.ID == 0 {
-		return entity, apperror.ErrNotFound
+	err := r.db.DB().Where(entity).First(entity).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return entity, apperror.ErrNotFound
+		}
 	}
-	return entity, nil
+	return entity, err
 }
 
 // Query retrieves the album records with the specified offset and limit from the database.
 func (r PostRepository) Query(ctx context.Context, offset, limit uint) ([]post.Post, error) {
 	var items []post.Post
 
-	r.dbWithContext(ctx, r.dbWithDefaults()).Find(&items)
-
-	return items, nil
+	err := r.dbWithContext(ctx, r.dbWithDefaults()).Find(&items).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return items, apperror.ErrNotFound
+		}
+	}
+	return items, err
 }
 
 // Create saves a new album record in the database.
@@ -56,7 +67,6 @@ func (r PostRepository) Create(ctx context.Context, entity *post.Post) error {
 	if !r.db.DB().NewRecord(entity) {
 		return errors.New("entity is not new")
 	}
-
 	return r.db.DB().Create(entity).Error
 }
 
@@ -65,7 +75,6 @@ func (r PostRepository) Update(ctx context.Context, entity *post.Post) error {
 	if r.db.DB().NewRecord(entity) {
 		return errors.New("entity is new")
 	}
-
 	return r.db.DB().Save(entity).Error
 }
 
@@ -75,7 +84,6 @@ func (r PostRepository) Delete(ctx context.Context, id uint) error {
 	if err != nil {
 		return err
 	}
-
 	return r.db.DB().Delete(entity).Error
 }
 

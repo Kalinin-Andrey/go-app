@@ -17,7 +17,7 @@ type Data map[string]interface{}
 type Session struct {
 	ID				uint		`gorm:"PRIMARY_KEY" json:"id"`
 	UserID			uint     	`sql:"type:int REFERENCES \"user\"(id)" json:"userId"`
-	User			user.User	`gorm:"FOREIGNKEY:UserID" json:"author"`
+	User			user.User	`gorm:"FOREIGNKEY:UserID;association_autoupdate:false" json:"author"`
 	Json			string		`sql:"type:JSONB NOT NULL DEFAULT '{}'::JSONB"`
 	Data			Data		`gorm:"-"`
 

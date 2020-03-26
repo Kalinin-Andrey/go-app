@@ -1,8 +1,10 @@
 package user
 
 import (
-	"strconv"
 	"time"
+
+	"github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
 const TableName = "user"
@@ -27,11 +29,8 @@ func New() *User {
 	return &User{}
 }
 
-func (e User) GetID() string {
-	return strconv.Itoa(int(e.ID))
-}
-
-
-func (e User) GetName() string {
-	return e.Name
+func (e User) Validate() error {
+	return validation.ValidateStruct(&e,
+		validation.Field(&e.Name, validation.Required, validation.Length(2, 100), is.Alpha),
+		)
 }

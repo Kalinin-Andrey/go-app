@@ -2,10 +2,10 @@ package db
 
 import (
 	"context"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/session"
 	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
 	"github.com/Kalinin-Andrey/redditclone/internal/pkg/apperror"
-	"github.com/Kalinin-Andrey/redditclone/pkg/db"
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/session"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 	"github.com/jinzhu/gorm"
 
@@ -44,13 +44,10 @@ func NewSessionRepository(ctx context.Context, dbase db.IDB, logger log.ILogger,
 			if err := r.Create(r.ctx, session); err != nil {
 				return r, err
 			}
-		} else {
-			return r, err
 		}
 	}
-
 	r.Session = *session
-	return r, nil
+	return r, err
 }
 
 func (r SessionRepository) NewEntity(userId uint) (*session.Session, error) {

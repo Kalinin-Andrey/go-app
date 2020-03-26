@@ -59,15 +59,13 @@ func (app *App) buildHandler() *routing.Router {
 
 	// serve index file
 	router.Get("/", file.Content("website/index.html"))
-	router.Get("/", file.Content("website/favicon.ico"))
-	router.Get("/", file.Content("website/manifest.json"))
-	// serve files under the "ui" subdirectory
-	router.Get("/css/*", file.Server(file.PathMap{
-		"/css/": "/website/css/",
+	router.Get("/favicon.ico", file.Content("website/favicon.ico"))
+	router.Get("/manifest.json", file.Content("website/manifest.json"))
+	// serve files under the "static" subdirectory
+	router.Get("/static/*", file.Server(file.PathMap{
+		"/static/": "/website/static/",
 	}))
-	router.Get("/js/*", file.Server(file.PathMap{
-		"/js/": "/website/js/",
-	}))
+
 	rg := router.Group("/api")
 
 	authHandler := auth.Handler(app.Cfg.JWTSigningKey, app.DB, app.Logger, app.Domain.User.Repository)
@@ -110,6 +108,7 @@ func (app *App) RegisterHandlers(rg *routing.RouteGroup, authHandler routing.Han
 
 	//controller.RegisterUserHandlers(rg, app.Domain.User.Service, app.Logger, authHandler)
 	controller.RegisterPostHandlers(rg, app.Domain.Post.Service, app.Domain.User.Service, app.Logger, authHandler)
-
+	controller.RegisterCommentHandlers(rg, app.Domain.Comment.Service, app.Logger, authHandler)
+	controller.RegisterVoteHandlers(rg, app.Domain.Vote.Service, app.Domain.Post.Service, app.Logger, authHandler)
 
 }

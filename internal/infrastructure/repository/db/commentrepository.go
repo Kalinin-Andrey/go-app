@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"github.com/jinzhu/gorm"
 
 	"github.com/pkg/errors"
 
@@ -25,28 +26,38 @@ func NewCommentRepository(repository *repository) (*CommentRepository, error) {
 
 // Get reads the album with the specified ID from the database.
 func (r CommentRepository) Get(ctx context.Context, id uint) (*comment.Comment, error) {
-	var entity comment.Comment
+	entity := &comment.Comment{}
 
-	r.dbWithDefaults().First(&entity, id)
-
-	return &entity, nil
+	err := r.dbWithDefaults().First(&entity, id).Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return entity, apperror.ErrNotFound
+		}
+	}
+	return entity, err
 }
 
 func (r CommentRepository) First(ctx context.Context, entity *comment.Comment) (*comment.Comment, error) {
-	r.db.DB().Where(entity).First(entity)
-	if entity.ID == 0 {
-		return entity, apperror.ErrNotFound
+	err := r.db.DB().Where(entity).First(entity).Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return entity, apperror.ErrNotFound
+		}
 	}
-	return entity, nil
+	return entity, err
 }
 
 // Query retrieves the album records with the specified offset and limit from the database.
 func (r CommentRepository) Query(ctx context.Context, offset, limit uint) ([]comment.Comment, error) {
 	var items []comment.Comment
 
-	r.dbWithContext(ctx, r.dbWithDefaults()).Find(&items)
-
-	return items, nil
+	err := r.dbWithContext(ctx, r.dbWithDefaults()).Find(&items).Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return items, apperror.ErrNotFound
+		}
+	}
+	return items, err
 }
 
 // Create saves a new album record in the database.
@@ -56,10 +67,14 @@ func (r CommentRepository) Create(ctx context.Context, entity *comment.Comment) 
 	if !r.db.DB().NewRecord(entity) {
 		return errors.New("entity is not new")
 	}
+	return r.db.DB().Create(entity).Error
+}
 
-	if err := r.db.DB().Create(entity).Error; err != nil {
+// Delete deletes an entity with the specified ID from the database.
+func (r CommentRepository) Delete(ctx context.Context, id uint) error {
+	entity, err := r.Get(ctx, id)
+	if err != nil {
 		return err
 	}
-
-	return nil
+	return r.db.DB().Delete(entity).Error
 }

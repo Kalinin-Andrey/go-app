@@ -1,11 +1,28 @@
 package auth
 
 import (
+	"net/http"
+
+	"github.com/go-ozzo/ozzo-routing/v2"
+	"github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
+
 	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
-	routing "github.com/go-ozzo/ozzo-routing/v2"
-	"net/http"
 )
+
+type identity struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (i identity) Validate() error {
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.Username, validation.Required, validation.Length(2, 100), is.Alphanumeric),
+		validation.Field(&i.Password, validation.Required, validation.Length(6, 100)),
+	)
+}
+
 
 // RegisterHandlers registers handlers for different HTTP requests.
 //	POST /api/register - регистрация
@@ -17,14 +34,15 @@ func RegisterHandlers(rg *routing.RouteGroup, service Service, logger log.ILogge
 
 func register(service Service, logger log.ILogger) routing.Handler {
 	return func(c *routing.Context) error {
-		var req struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
+		var req identity
 
 		if err := c.Read(&req); err != nil {
 			logger.With(c.Request.Context()).Errorf("invalid request: %v", err)
 			return errorshandler.BadRequest("")
+		}
+
+		if err := req.Validate(); err != nil {
+			return err
 		}
 
 		token, err := service.Register(c.Request.Context(), req.Username, req.Password)
@@ -44,14 +62,15 @@ func register(service Service, logger log.ILogger) routing.Handler {
 // login returns a handler that handles user login request.
 func login(service Service, logger log.ILogger) routing.Handler {
 	return func(c *routing.Context) error {
-		var req struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
+		var req identity
 
 		if err := c.Read(&req); err != nil {
 			logger.With(c.Request.Context()).Errorf("invalid request: %v", err)
 			return errorshandler.BadRequest("")
+		}
+
+		if err := req.Validate(); err != nil {
+			return err
 		}
 
 		token, err := service.Login(c.Request.Context(), req.Username, req.Password)

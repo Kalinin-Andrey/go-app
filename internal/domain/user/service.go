@@ -2,6 +2,9 @@ package user
 
 import (
 	"context"
+
+	"github.com/pkg/errors"
+
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 )
 
@@ -47,7 +50,7 @@ func (s service) NewEntity() *User {
 func (s service) Get(ctx context.Context, id uint) (*User, error) {
 	entity, err := s.repo.Get(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not get a user by id: %v", id)
 	}
 	return entity, nil
 }
@@ -61,7 +64,7 @@ func (s service) Count(ctx context.Context) (uint, error) {
 func (s service) Query(ctx context.Context, offset, limit uint) ([]User, error) {
 	items, err := s.repo.Query(ctx, offset, limit)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not find a list of users by ctx")
 	}
 	return items, nil
 }
@@ -70,7 +73,7 @@ func (s service) Query(ctx context.Context, offset, limit uint) ([]User, error) 
 func (s service) List(ctx context.Context) ([]User, error) {
 	items, err := s.repo.Query(ctx, 0, MaxLIstLimit)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Can not find a list of users by ctx")
 	}
 	return items, nil
 }
