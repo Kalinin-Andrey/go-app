@@ -1,6 +1,7 @@
 package session
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -15,11 +16,12 @@ type Data map[string]interface{}
 
 // Session is the session entity
 type Session struct {
-	ID				uint		`gorm:"PRIMARY_KEY" json:"id"`
-	UserID			uint     	`sql:"type:int REFERENCES \"user\"(id)" json:"userId"`
-	User			user.User	`gorm:"FOREIGNKEY:UserID;association_autoupdate:false" json:"author"`
-	Json			string		`sql:"type:JSONB NOT NULL DEFAULT '{}'::JSONB"`
-	Data			Data		`gorm:"-"`
+	ID				uint			`gorm:"PRIMARY_KEY" json:"id"`
+	UserID			uint     		`sql:"type:int REFERENCES \"user\"(id)" json:"userId"`
+	User			user.User		`gorm:"FOREIGNKEY:UserID;association_autoupdate:false" json:"author"`
+	Json			string			`sql:"type:JSONB NOT NULL DEFAULT '{}'::JSONB"`
+	Data			Data			`gorm:"-"`
+	Ctx				context.Context	`gorm:"-"`
 
 	CreatedAt		time.Time		`json:"created"`
 	UpdatedAt		time.Time		`json:"updated"`

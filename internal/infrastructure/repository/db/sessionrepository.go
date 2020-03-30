@@ -15,43 +15,26 @@ import (
 // PostRepository is a repository for the user entity
 type SessionRepository struct {
 	repository
-	ctx      context.Context
-	Session  session.Session
 	UserRepo user.IRepository
 }
 
 var _ session.IRepository = (*SessionRepository)(nil)
 
 // New creates a new PostRepository
-func NewSessionRepository(ctx context.Context, dbase db.IDB, logger log.ILogger, userRepo user.IRepository, userId uint) (*SessionRepository, error) {
+func NewSessionRepository(dbase db.IDB, logger log.ILogger, userRepo user.IRepository) (*SessionRepository, error) {
 	r := &SessionRepository{
 		repository: repository{
 			db:     dbase,
 			logger: logger,
 		},
-		ctx:      ctx,
 		UserRepo: userRepo,
 	}
 
-	session, err := r.GetByUserID(r.ctx, userId)
-	if err != nil {
-
-		if err == apperror.ErrNotFound {
-			if session, err = r.NewEntity(userId); err != nil {
-				return r, err
-			}
-
-			if err := r.Create(r.ctx, session); err != nil {
-				return r, err
-			}
-		}
-	}
-	r.Session = *session
-	return r, err
+	return r, nil
 }
 
-func (r SessionRepository) NewEntity(userId uint) (*session.Session, error) {
-	user, err := r.UserRepo.Get(r.ctx, userId)
+func (r SessionRepository) NewEntity(ctx context.Context, userId uint) (*session.Session, error) {
+	user, err := r.UserRepo.Get(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -63,28 +46,28 @@ func (r SessionRepository) NewEntity(userId uint) (*session.Session, error) {
 	}, nil
 }
 
-func (r SessionRepository) GetVar(name string) (interface{}, bool) {
+func (r SessionRepository) GetVar(session *session.Session, name string) (interface{}, bool) {
 
-	if r.Session.Data == nil {
-		r.Session.Data = make(map[string]interface{}, 1)
+	if session.Data == nil {
+		session.Data = make(map[string]interface{}, 1)
 	}
 
-	val, ok := r.Session.Data[name]
+	val, ok := session.Data[name]
 	return val, ok
 }
 
-func (r *SessionRepository) SetVar(name string, val interface{}) error {
+func (r *SessionRepository) SetVar(session *session.Session, name string, val interface{}) error {
 
-	if r.Session.Data == nil {
-		r.Session.Data = make(map[string]interface{}, 1)
+	if session.Data == nil {
+		session.Data = make(map[string]interface{}, 1)
 	}
 
-	r.Session.Data[name] = val
-	return r.SaveSession()
+	session.Data[name] = val
+	return r.SaveSession(session)
 }
 
-func (r *SessionRepository) SaveSession() error {
-	return r.Update(r.ctx, &r.Session)
+func (r *SessionRepository) SaveSession(session *session.Session) error {
+	return r.Update(session.Ctx, session)
 }
 
 

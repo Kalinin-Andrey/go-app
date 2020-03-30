@@ -2,9 +2,10 @@ package auth
 
 import (
 	"context"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
-	dbrep "github.com/Kalinin-Andrey/redditclone/internal/infrastructure/repository/db"
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/apperror"
 	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/session"
+	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 	"github.com/dgrijalva/jwt-go"
 	routing "github.com/go-ozzo/ozzo-routing/v2"
@@ -19,17 +20,32 @@ const (
 
 // Handler returns a JWT-based authentication middleware.
 //func Handler(verificationKey string, dbase db.IDB, logger log.ILogger) routing.Handler {
-func Handler(verificationKey string, dbase db.IDB, logger log.ILogger, userRepo user.IRepository) routing.Handler {
+func Handler(verificationKey string, dbase db.IDB, logger log.ILogger, sessRepo session.IRepository) routing.Handler {
 	return auth.JWT(verificationKey, auth.JWTOptions{TokenHandler: func(c *routing.Context, token *jwt.Token) error {
-		sessRepo, err := dbrep.NewSessionRepository(c.Request.Context(), dbase, logger, userRepo, uint(token.Claims.(jwt.MapClaims)["id"].(float64)))
+		ctx := c.Request.Context()
+		userID := uint(token.Claims.(jwt.MapClaims)["id"].(float64))
+
+		session, err := sessRepo.GetByUserID(ctx, userID)
 		if err != nil {
-			logger.With(c.Request.Context()).Error(err)
-			//	@todo: log and stop to all!
+
+			if err == apperror.ErrNotFound {
+				if session, err = sessRepo.NewEntity(ctx, userID); err != nil {
+					logger.With(ctx).Error(err)
+					return errorshandler.InternalServerError("")
+				}
+
+				if err := sessRepo.Create(ctx, session); err != nil {
+					logger.With(ctx).Error(err)
+					return errorshandler.InternalServerError("")
+				}
+			}
 		}
-		ctx := context.WithValue(
-			c.Request.Context(),
+		session.Ctx = ctx
+
+		ctx = context.WithValue(
+			ctx,
 			userSessionKey,
-			sessRepo,
+			session,
 		)
 		c.Request = c.Request.WithContext(ctx)
 		return nil
@@ -54,8 +70,8 @@ func WithUser(ctx context.Context, id uint, name string) context.Context {
 
 // CurrentUser returns the user identity from the given context.
 // Nil is returned if no user identity is found in the context.
-func CurrentSession(ctx context.Context) *dbrep.SessionRepository {
-	if sess, ok := ctx.Value(userSessionKey).(*dbrep.SessionRepository); ok {
+func CurrentSession(ctx context.Context) *session.Session {
+	if sess, ok := ctx.Value(userSessionKey).(*session.Session); ok {
 		return sess
 	}
 	return nil

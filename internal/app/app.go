@@ -1,44 +1,52 @@
 package app
 
 import (
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/comment"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/post"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/vote"
 	golog "log"
 
-	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
 	"github.com/Kalinin-Andrey/redditclone/pkg/config"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
+	"github.com/Kalinin-Andrey/redditclone/internal/pkg/session"
+
+	"github.com/Kalinin-Andrey/redditclone/internal/domain/comment"
+	"github.com/Kalinin-Andrey/redditclone/internal/domain/post"
 	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
+	"github.com/Kalinin-Andrey/redditclone/internal/domain/vote"
 	dbrep "github.com/Kalinin-Andrey/redditclone/internal/infrastructure/repository/db"
 )
 
+type IApp interface {
+	// Run is func to run the App
+	Run() error
+}
+
 // App struct is the common part of all applications
 type App struct {
-	Cfg    config.Configuration
-	Logger log.ILogger
-	DB     db.IDB
-	Domain Domain
+	Cfg					config.Configuration
+	Logger				log.ILogger
+	DB					db.IDB
+	Domain				Domain
+	SessionRepository	session.IRepository
 }
 
 // Domain is a Domain Layer Entry Point
 type Domain struct {
 	User struct {
-		Repository user.IRepository
-		Service    user.IService
+		Repository		user.IRepository
+		Service			user.IService
 	}
 	Post struct {
-		Repository post.IRepository
-		Service    post.IService
+		Repository		post.IRepository
+		Service			post.IService
 	}
 	Vote struct {
-		Repository vote.IRepository
-		Service    vote.IService
+		Repository		vote.IRepository
+		Service			vote.IService
 	}
 	Comment struct {
-		Repository comment.IRepository
-		Service    comment.IService
+		Repository		comment.IRepository
+		Service			comment.IService
 	}
 }
 
@@ -91,6 +99,10 @@ func New(cfg config.Configuration) *App {
 		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNameComment, EntityNameComment, app.getDBRepo(EntityNameComment))
 	}
 	app.Domain.Comment.Service = comment.NewService(app.Domain.Comment.Repository, app.Logger)
+
+	if app.SessionRepository, err = dbrep.NewSessionRepository(app.DB, app.Logger, app.Domain.User.Repository); err != nil {
+		golog.Fatalf("Can not get new SessionRepository err: %v", err)
+	}
 
 	return app
 }

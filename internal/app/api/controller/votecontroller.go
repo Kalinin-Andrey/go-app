@@ -54,9 +54,9 @@ func (c voteController) downvote(ctx *routing.Context) error {
 
 func (c voteController) vote(ctx *routing.Context, postId uint, val int) error {
 	entity := c.Service.NewEntity(postId, val)
-	sessRepo := auth.CurrentSession(ctx.Request.Context())
-	entity.UserID	= sessRepo.Session.UserID
-	entity.User		= sessRepo.Session.User
+	session := auth.CurrentSession(ctx.Request.Context())
+	entity.UserID	= session.UserID
+	entity.User		= session.User
 
 	if err := c.Service.Vote(ctx.Request.Context(), entity); err != nil {
 		c.Logger.With(ctx.Request.Context()).Error(err)
@@ -74,7 +74,7 @@ func (c voteController) vote(ctx *routing.Context, postId uint, val int) error {
 	}
 
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	return ctx.WriteWithStatus(post, http.StatusCreated)
+	return ctx.WriteWithStatus(post, http.StatusOK)
 }
 
 
@@ -83,11 +83,11 @@ func (c voteController) unvote(ctx *routing.Context) error {
 	if err != nil {
 		return errorshandler.BadRequest("postId must be uint")
 	}
-	sessRepo := auth.CurrentSession(ctx.Request.Context())
+	session := auth.CurrentSession(ctx.Request.Context())
 	entity := &vote.Vote{
 		PostID:    postId,
-		UserID:    sessRepo.Session.UserID,
-		User:      sessRepo.Session.User,
+		UserID:    session.UserID,
+		User:      session.User,
 	}
 
 	if err := c.Service.Unvote(ctx.Request.Context(), entity); err != nil {
@@ -106,7 +106,7 @@ func (c voteController) unvote(ctx *routing.Context) error {
 	}
 
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	return ctx.WriteWithStatus(post, http.StatusCreated)
+	return ctx.WriteWithStatus(post, http.StatusOK)
 }
 
 

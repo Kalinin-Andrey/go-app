@@ -6,6 +6,7 @@ import (
 
 // IRepository encapsulates the logic to access session from the data source.
 type IRepository interface {
+	NewEntity(ctx context.Context, userId uint) (*Session, error)
 	// Get returns the session with the specified user ID.
 	GetByUserID(ctx context.Context, userId uint) (*Session, error)
 	// Create saves a new entity in the storage.
@@ -15,7 +16,7 @@ type IRepository interface {
 	// Delete removes the entity with given ID from the storage.
 	Delete(ctx context.Context, id uint) error
 	SetDefaultConditions(conditions map[string]interface{})
-	GetVar(name string) (interface{}, bool)
-	SetVar(name string, val interface{}) error
+	GetVar(session *Session, name string) (interface{}, bool)
+	SetVar(session *Session, name string, val interface{}) error
 }
 

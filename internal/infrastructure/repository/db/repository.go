@@ -2,8 +2,11 @@ package db
 
 import (
 	"context"
-	"github.com/jinzhu/gorm"
+
 	"github.com/pkg/errors"
+
+	"github.com/iancoleman/strcase"
+	"github.com/jinzhu/gorm"
 
 	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
@@ -56,11 +59,13 @@ func (r repository) dbWithDefaults() *gorm.DB {
 	db := r.db.DB()
 
 	if where, ok := r.defaultConditions["Where"]; ok {
-		db = db.Where(where)
+		m := r.keysToSnakeCase(where.(map[string]interface{}))
+		db = db.Where(m)
 	}
 
 	if order, ok := r.defaultConditions["SortOrder"]; ok {
-		db = db.Order(order)
+		m := r.keysToSnakeCase(order.(map[string]interface{}))
+		db = db.Order(m)
 	}
 
 	if limit, ok := r.defaultConditions["Limit"]; ok {
@@ -74,11 +79,13 @@ func (r repository) dbWithDefaults() *gorm.DB {
 func (r repository) dbWithContext(ctx context.Context, db *gorm.DB) *gorm.DB {
 
 	if where := ctx.Value("Where"); where != nil {
-		db = db.Where(where)
+		m := r.keysToSnakeCase(where.(map[string]interface{}))
+		db = db.Where(m)
 	}
 
 	if order := ctx.Value("SortOrder"); order != nil {
-		db = db.Order(order)
+		m := r.keysToSnakeCase(order.(map[string]interface{}))
+		db = db.Order(m)
 	}
 
 	if limit := ctx.Value("Limit"); limit != nil {
@@ -86,4 +93,13 @@ func (r repository) dbWithContext(ctx context.Context, db *gorm.DB) *gorm.DB {
 	}
 
 	return db
+}
+
+func (r repository) keysToSnakeCase(in map[string]interface{}) map[string]interface{} {
+	out := make(map[string]interface{}, len(in))
+
+	for key, val := range in {
+		out[strcase.ToSnake(key)] = val
+	}
+	return out
 }

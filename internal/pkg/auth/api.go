@@ -19,7 +19,7 @@ type identity struct {
 func (i identity) Validate() error {
 	return validation.ValidateStruct(&i,
 		validation.Field(&i.Username, validation.Required, validation.Length(2, 100), is.Alphanumeric),
-		validation.Field(&i.Password, validation.Required, validation.Length(6, 100)),
+		validation.Field(&i.Password, validation.Required, validation.Length(4, 100)),
 	)
 }
 
@@ -47,7 +47,7 @@ func register(service Service, logger log.ILogger) routing.Handler {
 
 		token, err := service.Register(c.Request.Context(), req.Username, req.Password)
 		if err != nil {
-			if er, ok := err.(errorshandler.ErrorResponse); ok {
+			if er, ok := err.(errorshandler.Response); ok {
 				logger.Errorf("Error while registering user. Status: %v; err: %q; details: %v", er.StatusCode(), er.Message, er.Details)
 				return er
 			}

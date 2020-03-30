@@ -30,9 +30,9 @@ type App struct {
 }
 
 // New func is a constructor for the ApiApp
-func New(cfg config.Configuration) *App {
+func New(commonApp *commonApp.App, cfg config.Configuration) *App {
 	app := &App{
-		App: commonApp.New(cfg),
+		App:	commonApp,
 		Server:	nil,
 	}
 
@@ -56,9 +56,13 @@ func (app *App) buildHandler() *routing.Router {
 		content.TypeNegotiator(content.JSON),
 		cors.Handler(cors.AllowAll),
 	)
+	//router.NotFound(file.Content("website/index.html"))
 
 	// serve index file
 	router.Get("/", file.Content("website/index.html"))
+	router.Get("/a/*", file.Content("website/index.html"))
+	router.Get("/u/*", file.Content("website/index.html"))
+
 	router.Get("/favicon.ico", file.Content("website/favicon.ico"))
 	router.Get("/manifest.json", file.Content("website/manifest.json"))
 	// serve files under the "static" subdirectory
@@ -68,7 +72,7 @@ func (app *App) buildHandler() *routing.Router {
 
 	rg := router.Group("/api")
 
-	authHandler := auth.Handler(app.Cfg.JWTSigningKey, app.DB, app.Logger, app.Domain.User.Repository)
+	authHandler := auth.Handler(app.Cfg.JWTSigningKey, app.DB, app.Logger, app.SessionRepository)
 
 	auth.RegisterHandlers(rg.Group(""),
 		auth.NewService(app.Cfg.JWTSigningKey, app.Cfg.JWTExpiration, app.Domain.User.Service, app.Logger),
@@ -108,7 +112,7 @@ func (app *App) RegisterHandlers(rg *routing.RouteGroup, authHandler routing.Han
 
 	//controller.RegisterUserHandlers(rg, app.Domain.User.Service, app.Logger, authHandler)
 	controller.RegisterPostHandlers(rg, app.Domain.Post.Service, app.Domain.User.Service, app.Logger, authHandler)
-	controller.RegisterCommentHandlers(rg, app.Domain.Comment.Service, app.Logger, authHandler)
+	controller.RegisterCommentHandlers(rg, app.Domain.Comment.Service, app.Domain.Post.Service, app.Logger, authHandler)
 	controller.RegisterVoteHandlers(rg, app.Domain.Vote.Service, app.Domain.Post.Service, app.Logger, authHandler)
 
 }

@@ -6,19 +6,18 @@ import (
 	"github.com/heetch/confita"
 	"github.com/heetch/confita/backend/env"
 	"github.com/heetch/confita/backend/file"
-	"github.com/heetch/confita/backend/flags"
 )
 
 // Configuration is the struct for app configuration
 type Configuration struct {
 	Server		struct {
 		HTTPListen	string			`config:"httplisten"`
-	}									`config:"server"`
+	}								`config:"server"`
 	Log			Log					`config:"log"`
 	DB			DB					`config:"db"`
 	Repository	struct {
-		Type		string				`config:"type"`
-	}									`config:"repository"`
+		Type		string			`config:"type"`
+	}								`config:"repository"`
 	// JWT signing key. required.
 	JWTSigningKey string			`yaml:"jwt_signing_key" config:"JWT_SIGNING_KEY,secret"`
 	// JWT expiration in hours. Defaults to 72 hours (3 days)
@@ -57,7 +56,7 @@ func Get() (*Configuration, error) {
 	loader := confita.NewLoader(
 		file.NewBackend(pathToConfig),
 		env.NewBackend(),
-		flags.NewBackend(),
+		//flags.NewBackend(),
 	)
 	err := loader.Load(context.Background(), &config)
 	return &config, err

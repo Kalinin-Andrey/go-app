@@ -137,9 +137,9 @@ func (c postController) create(ctx *routing.Context) error {
 		return errorshandler.BadRequest(err.Error())
 	}
 
-	sessRepo := auth.CurrentSession(ctx.Request.Context())
-	entity.UserID	= sessRepo.Session.UserID
-	entity.User		= sessRepo.Session.User
+	session := auth.CurrentSession(ctx.Request.Context())
+	entity.UserID	= session.UserID
+	entity.User		= session.User
 
 	if err := c.Service.Create(ctx.Request.Context(), entity); err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(err)
@@ -168,11 +168,7 @@ func (c postController) delete(ctx *routing.Context) error {
 	}
 
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	return ctx.WriteWithStatus(struct{
-		message	string
-	}{
-		message: "success",
-	}, http.StatusOK)
+	return errorshandler.Success()
 }
 
 

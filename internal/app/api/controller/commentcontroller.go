@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/Kalinin-Andrey/redditclone/internal/domain/comment"
+	"github.com/Kalinin-Andrey/redditclone/internal/domain/post"
 	"github.com/Kalinin-Andrey/redditclone/internal/pkg/apperror"
 	"github.com/Kalinin-Andrey/redditclone/internal/pkg/auth"
 	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
@@ -15,15 +16,17 @@ import (
 
 type commentController struct {
 	Controller
-	Service comment.IService
-	Logger  log.ILogger
+	Service		comment.IService
+	PostService	post.IService
+	Logger		log.ILogger
 }
 
 //	POST /api/post/{POST_ID} - добавление коммента
 //	DELETE /api/post/{POST_ID}/{COMMENT_ID} - удаление коммента
-func RegisterCommentHandlers(r *routing.RouteGroup, service comment.IService, logger log.ILogger, authHandler routing.Handler) {
+func RegisterCommentHandlers(r *routing.RouteGroup, service comment.IService, postService post.IService, logger log.ILogger, authHandler routing.Handler) {
 	c := commentController{
 		Service:		service,
+		PostService:	postService,
 		Logger:			logger,
 	}
 
@@ -35,7 +38,8 @@ func RegisterCommentHandlers(r *routing.RouteGroup, service comment.IService, lo
 
 
 func (c commentController) create(ctx *routing.Context) error {
-	postId, err := strconv.ParseUint(ctx.Param("postId"), 10, 64)
+	pId, err := strconv.ParseUint(ctx.Param("postId"), 10, 64)
+	postId	:= uint(pId)
 	if err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(err)
 		return errorshandler.BadRequest("postId must be uint")
@@ -51,22 +55,38 @@ func (c commentController) create(ctx *routing.Context) error {
 		return errorshandler.BadRequest(err.Error())
 	}
 
-	sessRepo := auth.CurrentSession(ctx.Request.Context())
-	entity.PostID	= uint(postId)
-	entity.UserID	= sessRepo.Session.UserID
-	entity.User		= sessRepo.Session.User
+	session := auth.CurrentSession(ctx.Request.Context())
+	entity.PostID	= postId
+	entity.UserID	= session.UserID
+	entity.User		= session.User
 
 	if err := c.Service.Create(ctx.Request.Context(), entity); err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(err)
 		return errorshandler.BadRequest(err.Error())
 	}
 
+	post, err := c.PostService.Get(ctx.Request.Context(), postId)
+	if err != nil {
+		if err == apperror.ErrNotFound {
+			c.Logger.With(ctx.Request.Context()).Info(err)
+			return errorshandler.NotFound("")
+		}
+		c.Logger.With(ctx.Request.Context()).Error(err)
+		return errorshandler.InternalServerError("")
+	}
+
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	return ctx.WriteWithStatus(entity, http.StatusCreated)
+	return ctx.WriteWithStatus(post, http.StatusCreated)
 }
 
 
 func (c commentController) delete(ctx *routing.Context) error {
+	postId, err := strconv.ParseUint(ctx.Param("postId"), 10, 64)
+	if err != nil {
+		c.Logger.With(ctx.Request.Context()).Info(err)
+		return errorshandler.BadRequest("postId must be uint")
+	}
+
 	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(err)
@@ -82,8 +102,18 @@ func (c commentController) delete(ctx *routing.Context) error {
 		return errorshandler.InternalServerError("")
 	}
 
+	post, err := c.PostService.Get(ctx.Request.Context(), uint(postId))
+	if err != nil {
+		if err == apperror.ErrNotFound {
+			c.Logger.With(ctx.Request.Context()).Info(err)
+			return errorshandler.NotFound("")
+		}
+		c.Logger.With(ctx.Request.Context()).Error(err)
+		return errorshandler.InternalServerError("")
+	}
+
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	return ctx.WriteWithStatus("OK", http.StatusOK)
+	return ctx.WriteWithStatus(post, http.StatusOK)
 }
 
 
