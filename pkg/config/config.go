@@ -6,6 +6,7 @@ import (
 	"github.com/heetch/confita"
 	"github.com/heetch/confita/backend/env"
 	"github.com/heetch/confita/backend/file"
+	"github.com/heetch/confita/backend/flags"
 )
 
 // Configuration is the struct for app configuration
@@ -56,7 +57,7 @@ func Get() (*Configuration, error) {
 	loader := confita.NewLoader(
 		file.NewBackend(pathToConfig),
 		env.NewBackend(),
-		//flags.NewBackend(),
+		flags.NewBackend(),
 	)
 	err := loader.Load(context.Background(), &config)
 	return &config, err
