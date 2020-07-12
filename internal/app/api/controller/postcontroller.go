@@ -20,9 +20,9 @@ import (
 
 type postController struct {
 	Controller
-	Service post.IService
+	Service     post.IService
 	UserService user.IService
-	Logger  log.ILogger
+	Logger      log.ILogger
 }
 
 // RegisterHandlers sets up the routing of the HTTP handlers.
@@ -34,9 +34,9 @@ type postController struct {
 //	DELETE /api/post/{POST_ID} - удаление поста
 func RegisterPostHandlers(r *routing.RouteGroup, service post.IService, userService user.IService, logger log.ILogger, authHandler routing.Handler) {
 	c := postController{
-		Service:		service,
-		UserService:	userService,
-		Logger:			logger,
+		Service:     service,
+		UserService: userService,
+		Logger:      logger,
 	}
 
 	r.Get("/posts", c.list)
@@ -94,7 +94,7 @@ func (c postController) list(ctx *routing.Context) error {
 				return errors.Errorf("Can not assert interface{} to string for value: %#v", val)
 			}
 			user, err := c.UserService.First(rctx, &user.User{
-				Name:	userName,
+				Name: userName,
 			})
 			if err != nil {
 				if err == apperror.ErrNotFound {
@@ -138,8 +138,8 @@ func (c postController) create(ctx *routing.Context) error {
 	}
 
 	session := auth.CurrentSession(ctx.Request.Context())
-	entity.UserID	= session.UserID
-	entity.User		= session.User
+	entity.UserID = session.UserID
+	entity.User = session.User
 
 	if err := c.Service.Create(ctx.Request.Context(), entity); err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(err)
@@ -149,7 +149,6 @@ func (c postController) create(ctx *routing.Context) error {
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return ctx.WriteWithStatus(entity, http.StatusCreated)
 }
-
 
 func (c postController) delete(ctx *routing.Context) error {
 	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -170,5 +169,3 @@ func (c postController) delete(ctx *routing.Context) error {
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return errorshandler.Success()
 }
-
-

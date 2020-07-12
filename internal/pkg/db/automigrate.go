@@ -15,5 +15,5 @@ func (db *DB) AutoMigrateAll() {
 		&post.Post{},
 		&vote.Vote{},
 		&comment.Comment{},
-		)
+	)
 }

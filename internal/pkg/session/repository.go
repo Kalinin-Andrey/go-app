@@ -19,4 +19,3 @@ type IRepository interface {
 	GetVar(session *Session, name string) (interface{}, bool)
 	SetVar(session *Session, name string, val interface{}) error
 }
-

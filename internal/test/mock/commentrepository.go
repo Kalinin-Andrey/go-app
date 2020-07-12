@@ -10,27 +10,27 @@ import (
 // UserRepository is a mock for UserRepository
 type CommentRepository struct {
 	Response struct {
-		Get		struct {
-			Entity	*comment.Comment
-			Err		error
+		Get struct {
+			Entity *comment.Comment
+			Err    error
 		}
-		First	struct {
-			Entity	*comment.Comment
-			Err		error
+		First struct {
+			Entity *comment.Comment
+			Err    error
 		}
-		Query	struct {
-			List	[]comment.Comment
-			Err		error
+		Query struct {
+			List []comment.Comment
+			Err  error
 		}
-		Create	struct {
-			Entity	*comment.Comment
-			Err		error
+		Create struct {
+			Entity *comment.Comment
+			Err    error
 		}
-		Update	struct {
-			Err		error
+		Update struct {
+			Err error
 		}
-		Delete	struct {
-			Err		error
+		Delete struct {
+			Err error
 		}
 	}
 }

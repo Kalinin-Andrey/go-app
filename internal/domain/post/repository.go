@@ -21,4 +21,3 @@ type IRepository interface {
 	// Delete removes the album with given ID from the storage.
 	Delete(ctx context.Context, id uint) error
 }
-

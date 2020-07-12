@@ -7,6 +7,5 @@ import (
 const MaxLIstLimit = 1000
 
 type Service struct {
-	logger     log.ILogger
+	logger log.ILogger
 }
-

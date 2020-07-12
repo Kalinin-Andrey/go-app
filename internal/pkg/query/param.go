@@ -7,10 +7,9 @@ import (
 const QueryParams = "QueryParams"
 
 type Params struct {
-	Where	map[string]interface{}
-	SortOrder	string
+	Where     map[string]interface{}
+	SortOrder string
 }
-
 
 func ExtractParams(ctx context.Context) *Params {
 	var params *Params
@@ -19,4 +18,3 @@ func ExtractParams(ctx context.Context) *Params {
 	}
 	return params
 }
-

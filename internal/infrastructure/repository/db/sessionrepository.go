@@ -39,10 +39,10 @@ func (r SessionRepository) NewEntity(ctx context.Context, userId uint) (*session
 		return nil, err
 	}
 	return &session.Session{
-		UserID:		userId,
-		User:		*user,
-		Data:		make(map[string]interface{}, 1),
-		Json:		"{}",
+		UserID: userId,
+		User:   *user,
+		Data:   make(map[string]interface{}, 1),
+		Json:   "{}",
 	}, nil
 }
 
@@ -69,7 +69,6 @@ func (r *SessionRepository) SetVar(session *session.Session, name string, val in
 func (r *SessionRepository) SaveSession(session *session.Session) error {
 	return r.Update(session.Ctx, session)
 }
-
 
 // Get reads the album with the specified ID from the database.
 func (r SessionRepository) Get(ctx context.Context, id uint) (*session.Session, error) {
@@ -126,7 +125,7 @@ func (r SessionRepository) Update(ctx context.Context, entity *session.Session) 
 }
 
 // Delete removes the entity with given ID from the storage.
-func (r SessionRepository) Delete(ctx context.Context, id uint) (error) {
+func (r SessionRepository) Delete(ctx context.Context, id uint) error {
 	entity, err := r.Get(ctx, id)
 	if err != nil {
 		return err
@@ -134,4 +133,3 @@ func (r SessionRepository) Delete(ctx context.Context, id uint) (error) {
 
 	return r.db.DB().Delete(entity).Error
 }
-

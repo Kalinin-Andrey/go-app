@@ -41,4 +41,3 @@ func NewCommonApp(cfg config.Configuration) *commonApp.App {
 
 	return app
 }
-

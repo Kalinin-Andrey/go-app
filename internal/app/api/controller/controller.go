@@ -5,11 +5,10 @@ import (
 	"strconv"
 )
 
-type IService interface {}
+type IService interface{}
 
 type Controller struct {
 }
-
 
 func (c voteController) parseUint(ctx *routing.Context, paramName string) (uint, error) {
 	paramVal, err := strconv.ParseUint(ctx.Param(paramName), 10, 64)
@@ -19,7 +18,6 @@ func (c voteController) parseUint(ctx *routing.Context, paramName string) (uint,
 	}
 	return uint(paramVal), nil
 }
-
 
 func (c Controller) ExtractQueryFromContext(ctx *routing.Context) map[string]interface{} {
 	query := make(map[string]interface{}, 1)
@@ -33,5 +31,3 @@ func (c Controller) ExtractQueryFromContext(ctx *routing.Context) map[string]int
 
 	return query
 }
-
-

@@ -9,29 +9,29 @@ import (
 // UserRepository is a mock for UserRepository
 type SessionRepository struct {
 	Response struct {
-		NewEntity		struct {
-			Entity	*session.Session
-			Err		error
+		NewEntity struct {
+			Entity *session.Session
+			Err    error
 		}
-		GetByUserID	struct {
-			Entity	*session.Session
-			Err		error
+		GetByUserID struct {
+			Entity *session.Session
+			Err    error
 		}
-		Create	struct {
-			Err		error
+		Create struct {
+			Err error
 		}
-		Update	struct {
-			Err		error
+		Update struct {
+			Err error
 		}
-		Delete	struct {
-			Err		error
+		Delete struct {
+			Err error
 		}
-		SetVar	struct {
-			Err		error
+		SetVar struct {
+			Err error
 		}
-		GetVar	struct {
-			Val		interface{}
-			Ok		bool
+		GetVar struct {
+			Val interface{}
+			Ok  bool
 		}
 	}
 }

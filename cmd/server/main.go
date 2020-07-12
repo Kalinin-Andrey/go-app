@@ -9,7 +9,6 @@ import (
 	"github.com/Kalinin-Andrey/redditclone/internal/app/api"
 )
 
-
 func main() {
 	cfg, err := config.Get()
 	if err != nil {
@@ -21,4 +20,3 @@ func main() {
 		log.Fatalf("Error while application is running: %s", err.Error())
 	}
 }
-

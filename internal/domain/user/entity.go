@@ -11,14 +11,13 @@ const TableName = "user"
 
 // User is the user entity
 type User struct {
-	ID				uint		`gorm:"PRIMARY_KEY" json:"id"`
-	Name			string		`gorm:"type:varchar(100);UNIQUE;INDEX" json:"username"`
-	Passhash		string		`gorm:"type:bytea" json:"-"`
-	CreatedAt		time.Time
-	UpdatedAt		time.Time
-	DeletedAt		*time.Time	`gorm:"INDEX"`
+	ID        uint   `gorm:"PRIMARY_KEY" json:"id"`
+	Name      string `gorm:"type:varchar(100);UNIQUE;INDEX" json:"username"`
+	Passhash  string `gorm:"type:bytea" json:"-"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time `gorm:"INDEX"`
 }
-
 
 func (e User) TableName() string {
 	return TableName
@@ -32,5 +31,5 @@ func New() *User {
 func (e User) Validate() error {
 	return validation.ValidateStruct(&e,
 		validation.Field(&e.Name, validation.Required, validation.Length(2, 100), is.Alpha),
-		)
+	)
 }

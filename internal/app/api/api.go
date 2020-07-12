@@ -26,20 +26,20 @@ const Version = "1.0.0"
 // App is the application for API
 type App struct {
 	*commonApp.App
-	Server		*http.Server
+	Server *http.Server
 }
 
 // New func is a constructor for the ApiApp
 func New(commonApp *commonApp.App, cfg config.Configuration) *App {
 	app := &App{
-		App:	commonApp,
-		Server:	nil,
+		App:    commonApp,
+		Server: nil,
 	}
 
 	// build HTTP server
 	server := &http.Server{
-		Addr:		cfg.Server.HTTPListen,
-		Handler:	app.buildHandler(),
+		Addr:    cfg.Server.HTTPListen,
+		Handler: app.buildHandler(),
 	}
 	app.Server = server
 
@@ -81,7 +81,7 @@ func (app *App) buildHandler() *routing.Router {
 
 	app.RegisterHandlers(rg, authHandler)
 
-	return 	router
+	return router
 }
 
 // Run is func to run the ApiApp

@@ -23,7 +23,6 @@ func NewCommentRepository(repository *repository) (*CommentRepository, error) {
 	return &CommentRepository{repository: *repository}, nil
 }
 
-
 // Get reads the album with the specified ID from the database.
 func (r CommentRepository) Get(ctx context.Context, id uint) (*comment.Comment, error) {
 	entity := &comment.Comment{}

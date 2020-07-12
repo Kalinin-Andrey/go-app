@@ -22,7 +22,6 @@ func NewUserRepository(repository *repository) (*UserRepository, error) {
 	return &UserRepository{repository: *repository}, nil
 }
 
-
 // Get reads the album with the specified ID from the database.
 func (r UserRepository) Get(ctx context.Context, id uint) (*user.User, error) {
 	entity := &user.User{}

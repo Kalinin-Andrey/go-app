@@ -26,8 +26,8 @@ type IService interface {
 
 type service struct {
 	//Domain     Domain
-	repo       IRepository
-	logger     log.ILogger
+	repo   IRepository
+	logger log.ILogger
 }
 
 // NewService creates a new service.
@@ -39,14 +39,13 @@ func NewService(repo IRepository, logger log.ILogger) IService {
 
 // Defaults returns defaults params
 func (s service) defaultConditions() map[string]interface{} {
-	return map[string]interface{}{
-	}
+	return map[string]interface{}{}
 }
 
 func (s service) NewEntity(postId uint, val int) *Vote {
 	return &Vote{
-		PostID:	postId,
-		Value:	val,
+		PostID: postId,
+		Value:  val,
 	}
 }
 
@@ -58,6 +57,7 @@ func (s service) Get(ctx context.Context, id uint) (*Vote, error) {
 	}
 	return entity, nil
 }
+
 /*
 // Count returns the number of items.
 func (s service) Count(ctx context.Context) (uint, error) {
@@ -84,8 +84,8 @@ func (s service) List(ctx context.Context) ([]Vote, error) {
 
 func (s service) Vote(ctx context.Context, entity *Vote) (err error) {
 	item := &Vote{
-		PostID:		entity.PostID,
-		UserID:		entity.UserID,
+		PostID: entity.PostID,
+		UserID: entity.UserID,
 	}
 
 	if item, err = s.First(ctx, item); err != nil {
@@ -105,8 +105,8 @@ func (s service) Vote(ctx context.Context, entity *Vote) (err error) {
 
 func (s service) Unvote(ctx context.Context, entity *Vote) (err error) {
 	item := &Vote{
-		PostID:		entity.PostID,
-		UserID:		entity.UserID,
+		PostID: entity.PostID,
+		UserID: entity.UserID,
 	}
 
 	if item, err = s.First(ctx, item); err != nil {

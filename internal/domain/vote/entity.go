@@ -7,22 +7,21 @@ import (
 )
 
 const (
-	TableName	= "vote"
+	TableName = "vote"
 )
 
 // Vote is the user entity
 type Vote struct {
-	ID				uint     `gorm:"PRIMARY_KEY" json:"id"`
-	PostID			uint     `sql:"type:int REFERENCES post(id)" json:"postId"`
-	UserID			uint     `sql:"type:int REFERENCES \"user\"(id)" json:"user"`
-	User			user.User `gorm:"FOREIGNKEY:UserID;association_autoupdate:false" json:"author"`
-	Value			int       `json:"vote"`
+	ID     uint      `gorm:"PRIMARY_KEY" json:"id"`
+	PostID uint      `sql:"type:int REFERENCES post(id)" json:"postId"`
+	UserID uint      `sql:"type:int REFERENCES \"user\"(id)" json:"user"`
+	User   user.User `gorm:"FOREIGNKEY:UserID;association_autoupdate:false" json:"author"`
+	Value  int       `json:"vote"`
 
-	CreatedAt		time.Time		`json:"created"`
-	UpdatedAt		time.Time		`json:"updated"`
-	DeletedAt		*time.Time	`gorm:"INDEX" json:"deleted"`
+	CreatedAt time.Time  `json:"created"`
+	UpdatedAt time.Time  `json:"updated"`
+	DeletedAt *time.Time `gorm:"INDEX" json:"deleted"`
 }
-
 
 func (e Vote) TableName() string {
 	return TableName
@@ -32,4 +31,3 @@ func (e Vote) TableName() string {
 func New() *Vote {
 	return &Vote{}
 }
-

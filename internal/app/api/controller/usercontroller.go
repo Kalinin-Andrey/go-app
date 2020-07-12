@@ -19,8 +19,8 @@ type userController struct {
 // RegisterHandlers sets up the routing of the HTTP handlers.
 func RegisterUserHandlers(r *routing.RouteGroup, service user.IService, logger log.ILogger, authHandler routing.Handler) {
 	c := userController{
-		Service:	service,
-		Logger:		logger,
+		Service: service,
+		Logger:  logger,
 	}
 
 	r.Get(`/user/<id:\d+>`, c.get)
@@ -63,4 +63,3 @@ func (c userController) list(ctx *routing.Context) error {
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return ctx.Write(items)
 }
-

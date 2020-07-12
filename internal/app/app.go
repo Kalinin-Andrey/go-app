@@ -23,38 +23,38 @@ type IApp interface {
 
 // App struct is the common part of all applications
 type App struct {
-	Cfg					config.Configuration
-	Logger				log.ILogger
-	DB					db.IDB
-	Domain				Domain
-	SessionRepository	session.IRepository
+	Cfg               config.Configuration
+	Logger            log.ILogger
+	DB                db.IDB
+	Domain            Domain
+	SessionRepository session.IRepository
 }
 
 // Domain is a Domain Layer Entry Point
 type Domain struct {
 	User struct {
-		Repository		user.IRepository
-		Service			user.IService
+		Repository user.IRepository
+		Service    user.IService
 	}
 	Post struct {
-		Repository		post.IRepository
-		Service			post.IService
+		Repository post.IRepository
+		Service    post.IService
 	}
 	Vote struct {
-		Repository		vote.IRepository
-		Service			vote.IService
+		Repository vote.IRepository
+		Service    vote.IService
 	}
 	Comment struct {
-		Repository		comment.IRepository
-		Service			comment.IService
+		Repository comment.IRepository
+		Service    comment.IService
 	}
 }
 
 const (
-	EntityNameUser		= "user"
-	EntityNamePost		= "post"
-	EntityNameVote		= "vote"
-	EntityNameComment	= "comment"
+	EntityNameUser    = "user"
+	EntityNamePost    = "post"
+	EntityNameVote    = "vote"
+	EntityNameComment = "comment"
 )
 
 // New func is a constructor for the App
@@ -76,25 +76,25 @@ func New(cfg config.Configuration) *App {
 	}
 	var ok bool
 
-	app.Domain.User.Repository, ok	= app.getDBRepo(EntityNameUser).(user.IRepository)
+	app.Domain.User.Repository, ok = app.getDBRepo(EntityNameUser).(user.IRepository)
 	if !ok {
 		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNameUser, EntityNameUser, app.getDBRepo(EntityNameUser))
 	}
 	app.Domain.User.Service = user.NewService(app.Domain.User.Repository, app.Logger)
 
-	app.Domain.Post.Repository, ok	= app.getDBRepo(EntityNamePost).(post.IRepository)
+	app.Domain.Post.Repository, ok = app.getDBRepo(EntityNamePost).(post.IRepository)
 	if !ok {
 		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNamePost, EntityNamePost, app.getDBRepo(EntityNamePost))
 	}
 	app.Domain.Post.Service = post.NewService(app.Domain.Post.Repository, app.Logger)
 
-	app.Domain.Vote.Repository, ok	= app.getDBRepo(EntityNameVote).(vote.IRepository)
+	app.Domain.Vote.Repository, ok = app.getDBRepo(EntityNameVote).(vote.IRepository)
 	if !ok {
 		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNameVote, EntityNameVote, app.getDBRepo(EntityNameVote))
 	}
 	app.Domain.Vote.Service = vote.NewService(app.Domain.Vote.Repository, app.Logger)
 
-	app.Domain.Comment.Repository, ok	= app.getDBRepo(EntityNameComment).(comment.IRepository)
+	app.Domain.Comment.Repository, ok = app.getDBRepo(EntityNameComment).(comment.IRepository)
 	if !ok {
 		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNameComment, EntityNameComment, app.getDBRepo(EntityNameComment))
 	}

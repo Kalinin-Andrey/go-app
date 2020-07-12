@@ -21,4 +21,3 @@ type IRepository interface {
 	Delete(ctx context.Context, id uint) error
 	First(ctx context.Context, user *Comment) (*Comment, error)
 }
-

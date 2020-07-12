@@ -10,21 +10,21 @@ import (
 // UserRepository is a mock for UserRepository
 type UserRepository struct {
 	Response struct {
-		Get		struct {
-			Entity	*user.User
-			Err		error
+		Get struct {
+			Entity *user.User
+			Err    error
 		}
-		First	struct {
-			Entity	*user.User
-			Err		error
+		First struct {
+			Entity *user.User
+			Err    error
 		}
-		Query	struct {
-			List	[]user.User
-			Err		error
+		Query struct {
+			List []user.User
+			Err  error
 		}
-		Create	struct {
-			Entity	*user.User
-			Err		error
+		Create struct {
+			Entity *user.User
+			Err    error
 		}
 	}
 }

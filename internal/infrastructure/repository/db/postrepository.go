@@ -23,7 +23,6 @@ func NewPostRepository(repository *repository) (*PostRepository, error) {
 	return &PostRepository{repository: *repository}, nil
 }
 
-
 // Get reads the album with the specified ID from the database.
 func (r PostRepository) Get(ctx context.Context, id uint) (*post.Post, error) {
 	entity := &post.Post{}
@@ -86,4 +85,3 @@ func (r PostRepository) Delete(ctx context.Context, id uint) error {
 	}
 	return r.db.DB().Delete(entity).Error
 }
-

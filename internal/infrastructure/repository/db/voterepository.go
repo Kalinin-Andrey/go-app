@@ -23,7 +23,6 @@ func NewVoteRepository(repository *repository) (*VoteRepository, error) {
 	return &VoteRepository{repository: *repository}, nil
 }
 
-
 // Get reads the album with the specified ID from the database.
 func (r VoteRepository) Get(ctx context.Context, id uint) (*vote.Vote, error) {
 	entity := &vote.Vote{}
@@ -88,7 +87,6 @@ func (r VoteRepository) Create(ctx context.Context, entity *vote.Vote) error {
 	return tx.Commit().Error
 }
 
-
 func (r VoteRepository) Update(ctx context.Context, entity *vote.Vote) error {
 	var d int = 2 * entity.Value
 
@@ -115,7 +113,6 @@ func (r VoteRepository) Update(ctx context.Context, entity *vote.Vote) error {
 
 	return tx.Commit().Error
 }
-
 
 func (r VoteRepository) Delete(ctx context.Context, entity *vote.Vote) error {
 	var d int = -1 * entity.Value

@@ -19,13 +19,13 @@ type IService interface {
 	Create(ctx context.Context, entity *Post) error
 	ViewsIncr(ctx context.Context, entity *Post) error
 	//Update(ctx context.Context, entity *Post) error
-	Delete(ctx context.Context, id uint) (error)
+	Delete(ctx context.Context, id uint) error
 }
 
 type service struct {
 	//Domain     Domain
-	repo       IRepository
-	logger     log.ILogger
+	repo   IRepository
+	logger log.ILogger
 }
 
 // NewService creates a new service.
@@ -37,8 +37,7 @@ func NewService(repo IRepository, logger log.ILogger) IService {
 
 // Defaults returns defaults params
 func (s service) defaultConditions() map[string]interface{} {
-	return map[string]interface{}{
-	}
+	return map[string]interface{}{}
 }
 
 func (s service) NewEntity() *Post {
@@ -53,6 +52,7 @@ func (s service) Get(ctx context.Context, id uint) (*Post, error) {
 	}
 	return entity, nil
 }
+
 /*
 // Count returns the number of items.
 func (s service) Count(ctx context.Context) (uint, error) {
@@ -67,7 +67,6 @@ func (s service) Query(ctx context.Context, offset, limit uint) ([]Post, error) 
 	}
 	return items, nil
 }
-
 
 // List returns the items list.
 func (s service) List(ctx context.Context) ([]Post, error) {

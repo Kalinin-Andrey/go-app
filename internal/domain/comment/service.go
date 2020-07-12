@@ -17,14 +17,14 @@ type IService interface {
 	//Count(ctx context.Context) (uint, error)
 	Create(ctx context.Context, entity *Comment) error
 	//Update(ctx context.Context, id string, input *Comment) (*Comment, error)
-	Delete(ctx context.Context, id uint) (error)
+	Delete(ctx context.Context, id uint) error
 	First(ctx context.Context, user *Comment) (*Comment, error)
 }
 
 type service struct {
 	//Domain     Domain
-	repo       IRepository
-	logger     log.ILogger
+	repo   IRepository
+	logger log.ILogger
 }
 
 // NewService creates a new service.
@@ -36,8 +36,7 @@ func NewService(repo IRepository, logger log.ILogger) IService {
 
 // Defaults returns defaults params
 func (s service) defaultConditions() map[string]interface{} {
-	return map[string]interface{}{
-	}
+	return map[string]interface{}{}
 }
 
 func (s service) NewEntity() *Comment {
@@ -52,6 +51,7 @@ func (s service) Get(ctx context.Context, id uint) (*Comment, error) {
 	}
 	return entity, nil
 }
+
 /*
 // Count returns the number of items.
 func (s service) Count(ctx context.Context) (uint, error) {

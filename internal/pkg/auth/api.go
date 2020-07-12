@@ -23,7 +23,6 @@ func (i identity) Validate() error {
 	)
 }
 
-
 // RegisterHandlers registers handlers for different HTTP requests.
 //	POST /api/register - регистрация
 //	POST /api/login - логин

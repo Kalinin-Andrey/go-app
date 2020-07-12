@@ -16,18 +16,18 @@ import (
 
 type commentController struct {
 	Controller
-	Service		comment.IService
-	PostService	post.IService
-	Logger		log.ILogger
+	Service     comment.IService
+	PostService post.IService
+	Logger      log.ILogger
 }
 
 //	POST /api/post/{POST_ID} - добавление коммента
 //	DELETE /api/post/{POST_ID}/{COMMENT_ID} - удаление коммента
 func RegisterCommentHandlers(r *routing.RouteGroup, service comment.IService, postService post.IService, logger log.ILogger, authHandler routing.Handler) {
 	c := commentController{
-		Service:		service,
-		PostService:	postService,
-		Logger:			logger,
+		Service:     service,
+		PostService: postService,
+		Logger:      logger,
 	}
 
 	r.Use(authHandler)
@@ -36,10 +36,9 @@ func RegisterCommentHandlers(r *routing.RouteGroup, service comment.IService, po
 	r.Delete(`/post/<postId:\d+>/<id:\d+>`, c.delete)
 }
 
-
 func (c commentController) create(ctx *routing.Context) error {
 	pId, err := strconv.ParseUint(ctx.Param("postId"), 10, 64)
-	postId	:= uint(pId)
+	postId := uint(pId)
 	if err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(err)
 		return errorshandler.BadRequest("postId must be uint")
@@ -56,9 +55,9 @@ func (c commentController) create(ctx *routing.Context) error {
 	}
 
 	session := auth.CurrentSession(ctx.Request.Context())
-	entity.PostID	= postId
-	entity.UserID	= session.UserID
-	entity.User		= session.User
+	entity.PostID = postId
+	entity.UserID = session.UserID
+	entity.User = session.User
 
 	if err := c.Service.Create(ctx.Request.Context(), entity); err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(err)
@@ -78,7 +77,6 @@ func (c commentController) create(ctx *routing.Context) error {
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return ctx.WriteWithStatus(post, http.StatusCreated)
 }
-
 
 func (c commentController) delete(ctx *routing.Context) error {
 	postId, err := strconv.ParseUint(ctx.Param("postId"), 10, 64)
@@ -115,5 +113,3 @@ func (c commentController) delete(ctx *routing.Context) error {
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return ctx.WriteWithStatus(post, http.StatusOK)
 }
-
-

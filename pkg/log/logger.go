@@ -45,7 +45,6 @@ func (l *Logger) Print(v ...interface{}) {
 	l.Debug(v)
 }
 
-
 type contextKey int
 
 const (
@@ -53,9 +52,9 @@ const (
 	correlationIDKey
 )
 
-var defaultZapConfig	= zap.Config {
-	Encoding:		"json",
-	EncoderConfig:	zapcore.EncoderConfig{
+var defaultZapConfig = zap.Config{
+	Encoding: "json",
+	EncoderConfig: zapcore.EncoderConfig{
 		MessageKey:     "message",
 		LevelKey:       "level",
 		TimeKey:        "time",
@@ -85,16 +84,15 @@ func New(conf config.Log) (*Logger, error) {
 
 	logger := NewWithZap(zapLogger)
 
-
 	logger.Info("Logger construction succeeded")
 	return logger, nil
 }
 
 func configToZapConfig(conf config.Log) (zap.Config, error) {
 	cfg := defaultZapConfig
-	cfg.OutputPaths 	= conf.OutputPaths
-	cfg.Encoding		= conf.Encoding
-	cfg.InitialFields	= make(map[string]interface{}, len(conf.InitialFields))
+	cfg.OutputPaths = conf.OutputPaths
+	cfg.Encoding = conf.Encoding
+	cfg.InitialFields = make(map[string]interface{}, len(conf.InitialFields))
 
 	for key, val := range conf.InitialFields {
 		cfg.InitialFields[key] = val
@@ -104,7 +102,7 @@ func configToZapConfig(conf config.Log) (zap.Config, error) {
 		return cfg, errors.Wrapf(err, "Can not unmarshal text %q, expected one of zapcore.Levels", conf.Level)
 	}
 
-	return cfg,nil
+	return cfg, nil
 }
 
 // NewByDefault creates a new logger using the default configuration.
@@ -162,4 +160,3 @@ func getCorrelationID(req *http.Request) string {
 func getRequestID(req *http.Request) string {
 	return req.Header.Get("X-Request-ID")
 }
-

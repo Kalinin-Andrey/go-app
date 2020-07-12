@@ -15,7 +15,7 @@ type Response struct {
 
 func Success() Response {
 	return Response{
-		Status: http.StatusOK,
+		Status:  http.StatusOK,
 		Message: "success",
 	}
 }

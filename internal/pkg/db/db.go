@@ -6,7 +6,6 @@ import (
 
 	"github.com/Kalinin-Andrey/redditclone/pkg/config"
 	"github.com/Kalinin-Andrey/redditclone/pkg/log"
-
 	//"database/sql"
 	//_ "github.com/lib/pq"
 )
@@ -37,11 +36,10 @@ func New(conf config.DB, logger log.ILogger) (*DB, error) {
 	// Enable Logger, show detailed log
 	db.LogMode(true)
 	// Enable auto preload embeded entities
-	db = 	db.Set("gorm:auto_preload", true)
+	db = db.Set("gorm:auto_preload", true)
 
 	dbobj := &DB{db: db}
 	dbobj.AutoMigrateAll()
-	
+
 	return dbobj, nil
 }
-

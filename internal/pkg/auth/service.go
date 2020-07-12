@@ -40,7 +40,7 @@ type UserService interface {
 type service struct {
 	signingKey      string
 	tokenExpiration int
-	userService		user.IService
+	userService     user.IService
 	logger          log.ILogger
 }
 
@@ -121,7 +121,6 @@ func (s service) Register(ctx context.Context, username, password string) (strin
 	return s.generateJWT(user)
 }
 
-
 // Source: https://play.golang.org/p/tAZtO7L6pm
 // hash provided clear text password and compare it to provided hash
 func comparePassword(hash, pw []byte) bool {
@@ -141,4 +140,3 @@ func generateRandomBytes(n int) ([]byte, error) {
 	_, err := rand.Read(b)
 	return b, err
 }
-

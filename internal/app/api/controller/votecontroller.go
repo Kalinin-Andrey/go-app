@@ -13,9 +13,9 @@ import (
 
 type voteController struct {
 	Controller
-	Service vote.IService
+	Service     vote.IService
 	PostService post.IService
-	Logger  log.ILogger
+	Logger      log.ILogger
 }
 
 //	GET /api/post/{POST_ID}/upvote - рейтинг постп вверх
@@ -23,9 +23,9 @@ type voteController struct {
 //	GET /api/post/{POST_ID}/unvote - рейтинг постп вверх
 func RegisterVoteHandlers(r *routing.RouteGroup, service vote.IService, postService post.IService, logger log.ILogger, authHandler routing.Handler) {
 	c := voteController{
-		Service:		service,
-		PostService:	postService,
-		Logger:			logger,
+		Service:     service,
+		PostService: postService,
+		Logger:      logger,
 	}
 
 	r.Use(authHandler)
@@ -34,7 +34,6 @@ func RegisterVoteHandlers(r *routing.RouteGroup, service vote.IService, postServ
 	r.Get(`/post/<postId:\d+>/downvote`, c.downvote)
 	r.Get(`/post/<postId:\d+>/unvote`, c.unvote)
 }
-
 
 func (c voteController) upvote(ctx *routing.Context) error {
 	postId, err := c.parseUint(ctx, "postId")
@@ -55,8 +54,8 @@ func (c voteController) downvote(ctx *routing.Context) error {
 func (c voteController) vote(ctx *routing.Context, postId uint, val int) error {
 	entity := c.Service.NewEntity(postId, val)
 	session := auth.CurrentSession(ctx.Request.Context())
-	entity.UserID	= session.UserID
-	entity.User		= session.User
+	entity.UserID = session.UserID
+	entity.User = session.User
 
 	if err := c.Service.Vote(ctx.Request.Context(), entity); err != nil {
 		c.Logger.With(ctx.Request.Context()).Error(err)
@@ -77,7 +76,6 @@ func (c voteController) vote(ctx *routing.Context, postId uint, val int) error {
 	return ctx.WriteWithStatus(post, http.StatusOK)
 }
 
-
 func (c voteController) unvote(ctx *routing.Context) error {
 	postId, err := c.parseUint(ctx, "postId")
 	if err != nil {
@@ -85,9 +83,9 @@ func (c voteController) unvote(ctx *routing.Context) error {
 	}
 	session := auth.CurrentSession(ctx.Request.Context())
 	entity := &vote.Vote{
-		PostID:    postId,
-		UserID:    session.UserID,
-		User:      session.User,
+		PostID: postId,
+		UserID: session.UserID,
+		User:   session.User,
 	}
 
 	if err := c.Service.Unvote(ctx.Request.Context(), entity); err != nil {
@@ -108,6 +106,3 @@ func (c voteController) unvote(ctx *routing.Context) error {
 	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return ctx.WriteWithStatus(post, http.StatusOK)
 }
-
-
-

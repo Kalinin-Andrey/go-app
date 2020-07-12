@@ -9,26 +9,26 @@ import (
 // UserRepository is a mock for UserRepository
 type VoteRepository struct {
 	Response struct {
-		Get		struct {
-			Entity	*vote.Vote
-			Err		error
+		Get struct {
+			Entity *vote.Vote
+			Err    error
 		}
-		First	struct {
-			Entity	*vote.Vote
-			Err		error
+		First struct {
+			Entity *vote.Vote
+			Err    error
 		}
-		Query	struct {
-			List	[]vote.Vote
-			Err		error
+		Query struct {
+			List []vote.Vote
+			Err  error
 		}
-		Create	struct {
-			Err		error
+		Create struct {
+			Err error
 		}
-		Update	struct {
-			Err		error
+		Update struct {
+			Err error
 		}
-		Delete	struct {
-			Err		error
+		Delete struct {
+			Err error
 		}
 	}
 }

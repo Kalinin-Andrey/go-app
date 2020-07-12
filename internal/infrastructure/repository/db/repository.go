@@ -13,7 +13,7 @@ import (
 )
 
 // IRepository is an interface of repository
-type IRepository interface {}
+type IRepository interface{}
 
 // repository persists albums in database
 type repository struct {
@@ -46,8 +46,7 @@ func GetRepository(dbase db.IDB, logger log.ILogger, entity string) (repo IRepos
 	return repo, err
 }
 
-
-func  (r *repository) SetDefaultConditions(conditions map[string]interface{}) {
+func (r *repository) SetDefaultConditions(conditions map[string]interface{}) {
 	r.defaultConditions = conditions
 
 	if _, ok := r.defaultConditions["Limit"]; !ok {
@@ -74,7 +73,6 @@ func (r repository) dbWithDefaults() *gorm.DB {
 
 	return db
 }
-
 
 func (r repository) dbWithContext(ctx context.Context, db *gorm.DB) *gorm.DB {
 

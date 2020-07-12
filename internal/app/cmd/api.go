@@ -1,7 +1,6 @@
 package cmd
 
 import (
-
 	commonApp "github.com/Kalinin-Andrey/redditclone/internal/app"
 	"github.com/Kalinin-Andrey/redditclone/pkg/config"
 )

@@ -11,28 +11,28 @@ import (
 // UserRepository is a mock for UserRepository
 type PostRepository struct {
 	Response struct {
-		Get		struct {
-			Entity	*post.Post
-			Err		error
+		Get struct {
+			Entity *post.Post
+			Err    error
 		}
-		First	struct {
-			Entity	*post.Post
-			Err		error
+		First struct {
+			Entity *post.Post
+			Err    error
 		}
-		Query	struct {
-			List	[]post.Post
-			Err		error
+		Query struct {
+			List []post.Post
+			Err  error
 		}
-		Create	struct {
-			Entity	*post.Post
-			Err		error
+		Create struct {
+			Entity *post.Post
+			Err    error
 		}
-		Update	struct {
-			Entity	*post.Post
-			Err		error
+		Update struct {
+			Entity *post.Post
+			Err    error
 		}
-		Delete	struct {
-			Err		error
+		Delete struct {
+			Err error
 		}
 	}
 }
