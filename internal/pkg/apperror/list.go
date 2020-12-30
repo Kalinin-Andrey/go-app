@@ -12,3 +12,5 @@ var ErrBadRequest error = errors.New("Bad request")
 
 // ErrInternal is error for case when smth went wrong
 var ErrInternal error = errors.New("Internal error")
+
+var ErrTokenHasExpired error = errors.New("Token has expired")

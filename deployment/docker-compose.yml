@@ -12,14 +12,52 @@ services:
     #    - ./data/postgres:/docker-entrypoint-initdb.d
     restart: always
     environment:
-        PGDATA: /var/lib/postgresql-static/data
-        POSTGRES_DB:        postgres
-        POSTGRES_USER:      postgres
-        POSTGRES_PASSWORD:  postgres
+      PGDATA: /var/lib/postgresql-static/data
+      POSTGRES_DB:        postgres
+      POSTGRES_USER:      postgres
+      POSTGRES_PASSWORD:  postgres
     ports:
-        - "5401:5432"
+      - 5401:5432
+    networks:
+      - backend
+    tty: true
+
+  mongo:
+    container_name: mongo
+    image: mongo:4.4
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      #MONGO_INITDB_DATABASE: db
+    ports:
+      - '27017-27019:27017-27019'
+    networks:
+      - backend
+    tty: true
+
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+    ports:
+      - 8081:8081
+    networks:
+      - backend
+    tty: true
+
+  redis:
+    container_name: redis
+    image: redis:6.0
+    restart: always
+    ports:
+      - 6379:6379
     networks:
         - backend
     tty: true
+
 networks:
   backend:

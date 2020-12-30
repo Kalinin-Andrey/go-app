@@ -7,7 +7,10 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
-const TableName = "user"
+const (
+	EntityName = "user"
+	TableName  = "user"
+)
 
 // User is the user entity
 type User struct {

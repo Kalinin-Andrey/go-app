@@ -2,12 +2,18 @@ package controller
 
 import (
 	routing "github.com/go-ozzo/ozzo-routing/v2"
+	"redditclone/internal/domain"
 	"strconv"
 )
 
 type IService interface{}
 
 type Controller struct {
+}
+
+var matchedParams = []string{
+	"userName",
+	"category",
 }
 
 func (c voteController) parseUint(ctx *routing.Context, paramName string) (uint, error) {
@@ -19,8 +25,8 @@ func (c voteController) parseUint(ctx *routing.Context, paramName string) (uint,
 	return uint(paramVal), nil
 }
 
-func (c Controller) ExtractQueryFromContext(ctx *routing.Context) map[string]interface{} {
-	query := make(map[string]interface{}, 1)
+func (c Controller) ExtractQueryFromRoutingContext(ctx *routing.Context) domain.DBQueryConditions {
+	query := map[string]interface{}{}
 
 	for _, paramName := range matchedParams {
 
@@ -29,5 +35,7 @@ func (c Controller) ExtractQueryFromContext(ctx *routing.Context) map[string]int
 		}
 	}
 
-	return query
+	return domain.DBQueryConditions{
+		Where: query,
+	}
 }

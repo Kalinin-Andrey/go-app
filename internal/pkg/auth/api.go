@@ -7,8 +7,8 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 
-	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
-	"github.com/Kalinin-Andrey/redditclone/pkg/log"
+	"redditclone/internal/pkg/errorshandler"
+	"redditclone/internal/pkg/log"
 )
 
 type identity struct {
@@ -43,8 +43,8 @@ func register(service Service, logger log.ILogger) routing.Handler {
 		if err := req.Validate(); err != nil {
 			return err
 		}
-
-		token, err := service.Register(c.Request.Context(), req.Username, req.Password)
+		ctx := c.Request.Context()
+		token, err := service.Register(ctx, req.Username, req.Password)
 		if err != nil {
 			if er, ok := err.(errorshandler.Response); ok {
 				logger.Errorf("Error while registering user. Status: %v; err: %q; details: %v", er.StatusCode(), er.Message, er.Details)

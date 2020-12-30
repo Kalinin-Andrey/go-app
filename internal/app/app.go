@@ -1,110 +1,160 @@
 package app
 
 import (
+	"context"
+	"github.com/pkg/errors"
 	golog "log"
+	"redditclone/internal/pkg/apperror"
+	"redditclone/internal/pkg/config"
+	"redditclone/internal/pkg/log"
 
-	"github.com/Kalinin-Andrey/redditclone/pkg/config"
-	"github.com/Kalinin-Andrey/redditclone/pkg/log"
+	"redditclone/internal/pkg/auth"
+	"redditclone/internal/pkg/cache"
+	"redditclone/internal/pkg/db/mongo"
+	"redditclone/internal/pkg/db/pg"
+	"redditclone/internal/pkg/db/redis"
+	"redditclone/internal/pkg/jwt"
 
-	"github.com/Kalinin-Andrey/redditclone/internal/pkg/db"
-	"github.com/Kalinin-Andrey/redditclone/internal/pkg/session"
-
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/comment"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/post"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/vote"
-	dbrep "github.com/Kalinin-Andrey/redditclone/internal/infrastructure/repository/db"
+	"redditclone/internal/domain/comment"
+	"redditclone/internal/domain/post"
+	"redditclone/internal/domain/user"
+	"redditclone/internal/domain/vote"
+	mongorep "redditclone/internal/infrastructure/repository/mongo"
+	pgrep "redditclone/internal/infrastructure/repository/pg"
+	redisrep "redditclone/internal/infrastructure/repository/redis"
 )
-
-type IApp interface {
-	// Run is func to run the App
-	Run() error
-}
 
 // App struct is the common part of all applications
 type App struct {
-	Cfg               config.Configuration
-	Logger            log.ILogger
-	DB                db.IDB
-	Domain            Domain
-	SessionRepository session.IRepository
+	Cfg     config.Configuration
+	Logger  log.ILogger
+	DB      pg.IDB
+	MongoDB mongo.IDB
+	Redis   redis.IDB
+	Domain  Domain
+	Auth    Auth
+	Cache   cache.Service
+}
+
+type Auth struct {
+	SessionRepository auth.SessionRepository
+	TokenRepository   auth.TokenRepository
+	Service           auth.Service
 }
 
 // Domain is a Domain Layer Entry Point
 type Domain struct {
-	User struct {
-		Repository user.IRepository
-		Service    user.IService
-	}
-	Post struct {
-		Repository post.IRepository
-		Service    post.IService
-	}
-	Vote struct {
-		Repository vote.IRepository
-		Service    vote.IService
-	}
-	Comment struct {
-		Repository comment.IRepository
-		Service    comment.IService
-	}
+	User    DomainUser
+	Post    DomainPost
+	Vote    DomainVote
+	Comment DomainComment
 }
 
-const (
-	EntityNameUser    = "user"
-	EntityNamePost    = "post"
-	EntityNameVote    = "vote"
-	EntityNameComment = "comment"
-)
+type DomainUser struct {
+	Repository user.Repository
+	Service    user.IService
+}
+
+type DomainPost struct {
+	Repository post.Repository
+	Service    post.IService
+}
+
+type DomainVote struct {
+	Repository vote.Repository
+	Service    vote.IService
+}
+
+type DomainComment struct {
+	Repository comment.Repository
+	Service    comment.IService
+}
 
 // New func is a constructor for the App
 func New(cfg config.Configuration) *App {
 	logger, err := log.New(cfg.Log)
 	if err != nil {
-		panic(err)
+		golog.Fatal(err)
 	}
 
-	db, err := db.New(cfg.DB, logger)
+	pgDB, err := pg.New(cfg.DB.Pg, logger)
 	if err != nil {
-		panic(err)
+		golog.Fatal(err)
+	}
+
+	mDB, err := mongo.New(cfg.DB.Mongo)
+	if err != nil {
+		golog.Fatal(err)
+	}
+
+	rDB, err := redis.New(cfg.DB.Redis)
+	if err != nil {
+		golog.Fatal(err)
 	}
 
 	app := &App{
-		Cfg:    cfg,
-		Logger: logger,
-		DB:     db,
+		Cfg:     cfg,
+		Logger:  logger,
+		DB:      pgDB,
+		MongoDB: mDB,
+		Redis:   rDB,
 	}
-	var ok bool
 
-	app.Domain.User.Repository, ok = app.getDBRepo(EntityNameUser).(user.IRepository)
-	if !ok {
-		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNameUser, EntityNameUser, app.getDBRepo(EntityNameUser))
-	}
-	app.Domain.User.Service = user.NewService(app.Domain.User.Repository, app.Logger)
-
-	app.Domain.Post.Repository, ok = app.getDBRepo(EntityNamePost).(post.IRepository)
-	if !ok {
-		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNamePost, EntityNamePost, app.getDBRepo(EntityNamePost))
-	}
-	app.Domain.Post.Service = post.NewService(app.Domain.Post.Repository, app.Logger)
-
-	app.Domain.Vote.Repository, ok = app.getDBRepo(EntityNameVote).(vote.IRepository)
-	if !ok {
-		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNameVote, EntityNameVote, app.getDBRepo(EntityNameVote))
-	}
-	app.Domain.Vote.Service = vote.NewService(app.Domain.Vote.Repository, app.Logger)
-
-	app.Domain.Comment.Repository, ok = app.getDBRepo(EntityNameComment).(comment.IRepository)
-	if !ok {
-		golog.Fatalf("Can not cast DB repository for entity %q to %v.IRepository. Repo: %v", EntityNameComment, EntityNameComment, app.getDBRepo(EntityNameComment))
-	}
-	app.Domain.Comment.Service = comment.NewService(app.Domain.Comment.Repository, app.Logger)
-
-	if app.SessionRepository, err = dbrep.NewSessionRepository(app.DB, app.Logger, app.Domain.User.Repository); err != nil {
-		golog.Fatalf("Can not get new SessionRepository err: %v", err)
+	err = app.Init()
+	if err != nil {
+		golog.Fatal(err)
 	}
 
 	return app
+}
+
+func (app *App) Init() (err error) {
+	if err := app.SetupRepositories(); err != nil {
+		return err
+	}
+	app.SetupServices()
+	return nil
+}
+
+func (app *App) SetupRepositories() (err error) {
+	var ok bool
+
+	app.Domain.User.Repository, ok = app.getPgRepo(user.EntityName).(user.Repository)
+	if !ok {
+		return errors.Errorf("Can not cast DB repository for entity %q to %vRepository. Repo: %v", user.EntityName, user.EntityName, app.getPgRepo(user.EntityName))
+	}
+
+	app.Domain.Post.Repository, ok = app.getMongoRepo(post.EntityName).(post.Repository)
+	if !ok {
+		return errors.Errorf("Can not cast DB repository for entity %q to %vRepository. Repo: %v", post.EntityName, post.EntityName, app.getMongoRepo(post.EntityName))
+	}
+
+	app.Domain.Vote.Repository, ok = app.getMongoRepo(vote.EntityName).(vote.Repository)
+	if !ok {
+		return errors.Errorf("Can not cast DB repository for entity %q to %vRepository. Repo: %v", vote.EntityName, vote.EntityName, app.getMongoRepo(post.EntityName))
+	}
+
+	app.Domain.Comment.Repository, ok = app.getMongoRepo(comment.EntityName).(comment.Repository)
+	if !ok {
+		return errors.Errorf("Can not cast DB repository for entity %q to %vRepository. Repo: %v", comment.EntityName, comment.EntityName, app.getMongoRepo(post.EntityName))
+	}
+
+	if app.Auth.SessionRepository, err = redisrep.NewSessionRepository(app.Redis, app.Cfg.SessionLifeTime, app.Domain.User.Repository); err != nil {
+		return errors.Errorf("Can not get new SessionRepository err: %v", err)
+	}
+	app.Auth.TokenRepository = jwt.NewRepository()
+
+	app.Cache = cache.NewService(app.Redis, app.Cfg.CacheLifeTime)
+
+	return nil
+}
+
+func (app *App) SetupServices() {
+	app.Domain.User.Service = user.NewService(app.Logger, app.Domain.User.Repository)
+	app.Domain.Post.Service = post.NewService(app.Logger, app.Domain.Post.Repository, app.Domain.Comment.Repository, app.Domain.Vote.Repository)
+	app.Domain.Vote.Service = vote.NewService(app.Logger, app.Domain.Vote.Repository)
+	app.Domain.Comment.Service = comment.NewService(app.Logger, app.Domain.Comment.Repository)
+	app.Auth.Service = auth.NewService(app.Cfg.JWTSigningKey, app.Cfg.JWTExpiration, app.Domain.User.Service, app.Logger, app.Auth.SessionRepository, app.Auth.TokenRepository)
 }
 
 // Run is func to run the App
@@ -112,11 +162,37 @@ func (app *App) Run() error {
 	return nil
 }
 
-func (app *App) getDBRepo(entityName string) (repo dbrep.IRepository) {
+func (app *App) getPgRepo(entityName string) (repo pgrep.IRepository) {
 	var err error
 
-	if repo, err = dbrep.GetRepository(app.DB, app.Logger, entityName); err != nil {
+	if repo, err = pgrep.GetRepository(app.Logger, app.DB, entityName); err != nil {
 		golog.Fatalf("Can not get db repository for entity %q, error happened: %v", entityName, err)
 	}
 	return repo
+}
+
+func (app *App) getMongoRepo(entityName string) (repo mongorep.IRepository) {
+	var err error
+
+	if repo, err = mongorep.GetRepository(app.Logger, app.MongoDB, entityName); err != nil {
+		golog.Fatalf("Can not get mongodb repository for entity %q, error happened: %v", entityName, err)
+	}
+	return repo
+}
+
+func (app *App) Stop() error {
+	errRedis := app.Redis.Close()
+	errPg := app.DB.DB().Close()
+	errMongo := app.MongoDB.Close(context.Background())
+
+	switch {
+	case errPg != nil:
+		return errors.Wrapf(apperror.ErrInternal, "pg error: %v", errPg)
+	case errMongo != nil:
+		return errors.Wrapf(apperror.ErrInternal, "mongo error: %v", errMongo)
+	case errRedis != nil:
+		return errors.Wrapf(apperror.ErrInternal, "redis error: %v", errRedis)
+	}
+
+	return nil
 }

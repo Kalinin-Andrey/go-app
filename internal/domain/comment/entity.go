@@ -5,17 +5,18 @@ import (
 
 	"github.com/go-ozzo/ozzo-validation/v4"
 
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
+	"redditclone/internal/domain/user"
 )
 
 const (
-	TableName = "comment"
+	EntityName = "comment"
+	TableName  = "comment"
 )
 
 // Comment is the user entity
 type Comment struct {
-	ID     uint      `gorm:"PRIMARY_KEY" json:"id"`
-	PostID uint      `sql:"type:int REFERENCES post(id)" json:"postId"`
+	ID     string    `gorm:"PRIMARY_KEY" json:"id"`
+	PostID string    `sql:"type:varchar REFERENCES post(id)" json:"postId"`
 	UserID uint      `sql:"type:int REFERENCES \"user\"(id)" json:"userId"`
 	User   user.User `gorm:"FOREIGNKEY:UserID;association_autoupdate:false" json:"author"`
 	Body   string    `json:"body"`

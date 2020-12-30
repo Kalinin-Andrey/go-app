@@ -2,33 +2,43 @@ package session
 
 import (
 	"context"
-	"encoding/json"
+	"encoding"
 	"time"
 
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
+	"redditclone/internal/pkg/proto"
+
+	"redditclone/internal/domain/user"
 )
 
 const (
-	TableName = "session"
+	EntityName = "session"
+	TableName  = "session"
 )
 
-type Data map[string]interface{}
+type Data struct {
+	UserID              uint
+	UserName            string
+	ExpirationTokenTime time.Time
+}
 
 // Session is the session entity
 type Session struct {
 	ID     uint            `gorm:"PRIMARY_KEY" json:"id"`
-	UserID uint            `sql:"type:int REFERENCES \"user\"(id)" json:"userId"`
+	UserID uint            `sql:"type:int NOT NULL REFERENCES \"user\"(id)" json:"userId"`
 	User   user.User       `gorm:"FOREIGNKEY:UserID;association_autoupdate:false" json:"author"`
-	Json   string          `sql:"type:JSONB NOT NULL DEFAULT '{}'::JSONB"`
 	Data   Data            `gorm:"-"`
 	Ctx    context.Context `gorm:"-"`
+	Token  string          `gorm:"type:text;unique_index;not null" json:"token"`
 
 	CreatedAt time.Time  `json:"created"`
 	UpdatedAt time.Time  `json:"updated"`
 	DeletedAt *time.Time `gorm:"INDEX" json:"deleted"`
 }
 
-func (s Session) TableName() string {
+var _ encoding.BinaryMarshaler = (*Session)(nil)
+var _ encoding.BinaryUnmarshaler = (*Session)(nil)
+
+func (e Session) TableName() string {
 	return TableName
 }
 
@@ -37,33 +47,27 @@ func New() *Session {
 	return &Session{}
 }
 
-func (s *Session) SetDataByJson() error {
-
-	if s.Json == "" || s.Json == "{}" {
-		s.Data = make(map[string]interface{}, 1)
-		s.Json = "{}"
-		return nil
-	}
-
-	err := json.Unmarshal([]byte(s.Json), &s.Data)
+func (e *Session) MarshalBinary() (data []byte, err error) {
+	sessionProto, err := Session2SessionProto(*e)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return sessionProto.MarshalBinary()
 }
 
-func (s *Session) SetJsonByData() error {
+func (e *Session) UnmarshalBinary(data []byte) (err error) {
+	sessionProto := &proto.Session{}
 
-	if s.Data == nil {
-		s.Data = make(map[string]interface{}, 1)
-		s.Json = "{}"
-		return nil
-	}
-
-	bytes, err := json.Marshal(s.Data)
+	err = sessionProto.UnmarshalBinary(data)
 	if err != nil {
 		return err
 	}
-	s.Json = string(bytes)
+
+	s, err := SessionProto2Session(*sessionProto)
+	if err != nil {
+		return err
+	}
+
+	*e = *s
 	return nil
 }

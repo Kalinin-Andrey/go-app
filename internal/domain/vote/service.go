@@ -2,56 +2,58 @@ package vote
 
 import (
 	"context"
-	"github.com/Kalinin-Andrey/redditclone/internal/pkg/apperror"
-	"github.com/Kalinin-Andrey/redditclone/pkg/log"
 	"github.com/pkg/errors"
+	"redditclone/internal/domain"
+	"redditclone/internal/pkg/log"
 )
 
 const MaxLIstLimit = 1000
 
 // IService encapsulates usecase logic for user.
 type IService interface {
-	NewEntity(postId uint, val int) *Vote
-	Get(ctx context.Context, id uint) (*Vote, error)
+	NewEntity(userId uint, postId string, val int) *Vote
+	Get(ctx context.Context, id string) (*Vote, error)
 	Query(ctx context.Context, offset, limit uint) ([]Vote, error)
 	List(ctx context.Context) ([]Vote, error)
 	//Count(ctx context.Context) (uint, error)
-	Vote(ctx context.Context, entity *Vote) error
-	Unvote(ctx context.Context, entity *Vote) error
 	Create(ctx context.Context, entity *Vote) error
 	Update(ctx context.Context, entity *Vote) error
-	Delete(ctx context.Context, entity *Vote) error
+	Delete(ctx context.Context, id string) error
 	First(ctx context.Context, user *Vote) (*Vote, error)
 }
 
 type service struct {
 	//Domain     Domain
-	repo   IRepository
-	logger log.ILogger
+	logger     log.ILogger
+	repository Repository
 }
 
 // NewService creates a new service.
-func NewService(repo IRepository, logger log.ILogger) IService {
-	s := &service{repo, logger}
+func NewService(logger log.ILogger, repo Repository) IService {
+	s := &service{
+		logger:     logger,
+		repository: repo,
+	}
 	repo.SetDefaultConditions(s.defaultConditions())
 	return s
 }
 
 // Defaults returns defaults params
-func (s service) defaultConditions() map[string]interface{} {
-	return map[string]interface{}{}
+func (s service) defaultConditions() domain.DBQueryConditions {
+	return domain.DBQueryConditions{}
 }
 
-func (s service) NewEntity(postId uint, val int) *Vote {
+func (s service) NewEntity(userId uint, postId string, val int) *Vote {
 	return &Vote{
+		UserID:	userId,
 		PostID: postId,
 		Value:  val,
 	}
 }
 
 // Get returns the entity with the specified ID.
-func (s service) Get(ctx context.Context, id uint) (*Vote, error) {
-	entity, err := s.repo.Get(ctx, id)
+func (s service) Get(ctx context.Context, id string) (*Vote, error) {
+	entity, err := s.repository.Get(ctx, id)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not get a vote by id: %v", id)
 	}
@@ -61,12 +63,12 @@ func (s service) Get(ctx context.Context, id uint) (*Vote, error) {
 /*
 // Count returns the number of items.
 func (s service) Count(ctx context.Context) (uint, error) {
-	return s.repo.Count(ctx)
+	return s.repository.Count(ctx)
 }*/
 
 // Query returns the items with the specified offset and limit.
 func (s service) Query(ctx context.Context, offset, limit uint) ([]Vote, error) {
-	items, err := s.repo.Query(ctx, offset, limit)
+	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of votes by ctx")
 	}
@@ -75,62 +77,25 @@ func (s service) Query(ctx context.Context, offset, limit uint) ([]Vote, error) 
 
 // List returns the items list.
 func (s service) List(ctx context.Context) ([]Vote, error) {
-	items, err := s.repo.Query(ctx, 0, MaxLIstLimit)
+	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of votes by ctx")
 	}
 	return items, nil
 }
 
-func (s service) Vote(ctx context.Context, entity *Vote) (err error) {
-	item := &Vote{
-		PostID: entity.PostID,
-		UserID: entity.UserID,
-	}
-
-	if item, err = s.First(ctx, item); err != nil {
-		if err == apperror.ErrNotFound {
-			return s.Create(ctx, entity)
-		}
-		return errors.Wrapf(err, "Can not find a vote by params: %v", item)
-	}
-
-	if item.Value == entity.Value {
-		//	no action
-		return nil
-	}
-	item.Value = entity.Value
-	return s.Update(ctx, item)
-}
-
-func (s service) Unvote(ctx context.Context, entity *Vote) (err error) {
-	item := &Vote{
-		PostID: entity.PostID,
-		UserID: entity.UserID,
-	}
-
-	if item, err = s.First(ctx, item); err != nil {
-		if err == apperror.ErrNotFound {
-			return err
-		}
-		return errors.Wrapf(err, "Can not find a vote by params: %v", item)
-	}
-
-	return s.Delete(ctx, item)
+func (s service) First(ctx context.Context, entity *Vote) (*Vote, error) {
+	return s.repository.First(ctx, entity)
 }
 
 func (s service) Create(ctx context.Context, entity *Vote) error {
-	return s.repo.Create(ctx, entity)
+	return s.repository.Create(ctx, entity)
 }
 
 func (s service) Update(ctx context.Context, entity *Vote) error {
-	return s.repo.Update(ctx, entity)
+	return s.repository.Update(ctx, entity)
 }
 
-func (s service) Delete(ctx context.Context, entity *Vote) error {
-	return s.repo.Delete(ctx, entity)
-}
-
-func (s service) First(ctx context.Context, user *Vote) (*Vote, error) {
-	return s.repo.First(ctx, user)
+func (s service) Delete(ctx context.Context, id string) error {
+	return s.repository.Delete(ctx, id)
 }

@@ -5,16 +5,14 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/pbkdf2"
+	"redditclone/internal/pkg/session"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/dgrijalva/jwt-go"
-
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
-	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
-	"github.com/Kalinin-Andrey/redditclone/pkg/log"
+	"redditclone/internal/domain/user"
+	"redditclone/internal/pkg/errorshandler"
+	"redditclone/internal/pkg/log"
 )
 
 // Service encapsulates the authentication logic.
@@ -24,6 +22,7 @@ type Service interface {
 	Login(ctx context.Context, username, password string) (string, error)
 	Register(ctx context.Context, username, password string) (string, error)
 	NewUser(username, password string) (*user.User, error)
+	StringTokenValidation(ctx context.Context, stringToken string) (resCtx context.Context, isValid bool, err error)
 }
 
 // Identity represents an authenticated user identity.
@@ -38,20 +37,32 @@ type UserService interface {
 }
 
 type service struct {
-	signingKey      string
-	tokenExpiration int
-	userService     user.IService
-	logger          log.ILogger
+	signingKey        string
+	tokenExpiration   uint
+	userService       user.IService
+	logger            log.ILogger
+	sessionRepository SessionRepository
+	tokenRepository   TokenRepository
 }
 
+type contextKey int
+
 const (
-	saltSize   = 64
-	iterations = 1e4
+	saltSize                  = 64
+	iterations                = 1e4
+	userSessionKey contextKey = iota
 )
 
 // NewService creates a new authentication service.
-func NewService(signingKey string, tokenExpiration int, userService user.IService, logger log.ILogger) Service {
-	return service{signingKey, tokenExpiration, userService, logger}
+func NewService(signingKey string, tokenExpiration uint, userService user.IService, logger log.ILogger, sessionRepo SessionRepository, tokenRepo TokenRepository) *service {
+	return &service{
+		signingKey:        signingKey,
+		tokenExpiration:   tokenExpiration,
+		userService:       userService,
+		logger:            logger,
+		sessionRepository: sessionRepo,
+		tokenRepository:   tokenRepo,
+	}
 }
 
 func (s service) NewUser(username, password string) (*user.User, error) {
@@ -74,7 +85,73 @@ func (s service) Login(ctx context.Context, username, password string) (string, 
 	if err != nil {
 		return "", err
 	}
-	return s.generateJWT(user)
+
+	session, err := s.sessionRepository.Get(ctx, user.ID)
+	if err != nil {
+		return s.createSession(ctx, *user)
+	}
+	return s.updateSession(ctx, *user, session)
+}
+
+func (s service) updateSession(ctx context.Context, user user.User, sess *session.Session) (string, error) {
+	token, err := s.getStringTokenByUser(user)
+	if err != nil {
+		return "", err
+	}
+	sess.Token = token
+	sess.User = user
+	sess.Data = session.Data{
+		UserID:              user.ID,
+		UserName:            user.Name,
+		ExpirationTokenTime: s.getTokenExpirationTime(),
+	}
+
+	return token, s.sessionRepository.Update(ctx, sess)
+}
+
+func (s service) createSession(ctx context.Context, user user.User) (string, error) {
+	token, err := s.getStringTokenByUser(user)
+	if err != nil {
+		return "", err
+	}
+
+	sess, err := s.sessionRepository.NewEntity(ctx, user.ID)
+	if err != nil {
+		return "", err
+	}
+	sess.Token = token
+	sess.User = user
+	sess.Data = session.Data{
+		UserID:              user.ID,
+		UserName:            user.Name,
+		ExpirationTokenTime: s.getTokenExpirationTime(),
+	}
+
+	err = s.sessionRepository.Create(ctx, sess)
+	if err != nil {
+		return "", err
+	}
+
+	ctx = context.WithValue(
+		ctx,
+		userSessionKey,
+		sess,
+	)
+	sess.Ctx = ctx
+	return token, nil
+}
+
+func (s service) getTokenExpirationTime() time.Time {
+	return time.Now().Add(time.Duration(int64(s.tokenExpiration)) * time.Hour)
+}
+
+func (s service) getStringTokenByUser(user user.User) (string, error) {
+	token := s.tokenRepository.NewTokenByData(TokenData{
+		UserID:              user.ID,
+		UserName:            user.Name,
+		ExpirationTokenTime: s.getTokenExpirationTime(),
+	})
+	return token.GenerateStringToken(s.signingKey)
 }
 
 // authenticate authenticates a user using username and password.
@@ -99,15 +176,6 @@ func (s service) authenticate(ctx context.Context, username, password string) (*
 	return user, errorshandler.Unauthorized("")
 }
 
-// generateJWT generates a JWT that encodes an identity.
-func (s service) generateJWT(user *user.User) (string, error) {
-	return jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":   user.ID,
-		"name": user.Name,
-		"exp":  time.Now().Add(time.Duration(s.tokenExpiration) * time.Hour).Unix(),
-	}).SignedString([]byte(s.signingKey))
-}
-
 func (s service) Register(ctx context.Context, username, password string) (string, error) {
 	user, err := s.NewUser(username, password)
 	if err != nil {
@@ -118,7 +186,29 @@ func (s service) Register(ctx context.Context, username, password string) (strin
 		return "", errorshandler.BadRequest(err.Error())
 	}
 
-	return s.generateJWT(user)
+	return s.createSession(ctx, *user)
+}
+
+func (s service) StringTokenValidation(ctx context.Context, stringToken string) (resCtx context.Context, isValid bool, err error) {
+	resCtx = ctx
+	token, err := s.tokenRepository.ParseStringToken(stringToken, s.signingKey)
+	if err != nil {
+		return resCtx, isValid, err
+	}
+
+	session, err := s.sessionRepository.Get(ctx, token.GetData().UserID)
+	if err != nil {
+		return resCtx, isValid, err
+	}
+	isValid = true
+
+	resCtx = context.WithValue(
+		ctx,
+		userSessionKey,
+		session,
+	)
+	session.Ctx = resCtx
+	return resCtx, isValid, nil
 }
 
 // Source: https://play.golang.org/p/tAZtO7L6pm

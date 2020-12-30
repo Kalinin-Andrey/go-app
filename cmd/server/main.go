@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"github.com/Kalinin-Andrey/redditclone/pkg/config"
+	"redditclone/internal/pkg/config"
 
-	commonApp "github.com/Kalinin-Andrey/redditclone/internal/app"
-	"github.com/Kalinin-Andrey/redditclone/internal/app/api"
+	commonApp "redditclone/internal/app"
+	"redditclone/internal/app/api"
 )
 
 func main() {
@@ -19,4 +19,9 @@ func main() {
 	if err := app.Run(); err != nil {
 		log.Fatalf("Error while application is running: %s", err.Error())
 	}
+	defer func() {
+		if err := app.Stop(); err != nil {
+			log.Fatalf("Error while application is stopping: %s", err.Error())
+		}
+	}()
 }

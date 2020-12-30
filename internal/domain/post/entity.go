@@ -6,15 +6,16 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/comment"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/user"
-	"github.com/Kalinin-Andrey/redditclone/internal/domain/vote"
+	"redditclone/internal/domain/comment"
+	"redditclone/internal/domain/user"
+	"redditclone/internal/domain/vote"
 )
 
 const (
-	TableName = "post"
-	TypeText  = "text"
-	TypeLink  = "link"
+	EntityName = "post"
+	TableName  = "post"
+	TypeText   = "text"
+	TypeLink   = "link"
 
 	CategoryMusic       = "music"
 	CategoryFunny       = "funny"
@@ -40,7 +41,7 @@ var Categories []string = []string{
 
 // Post is the user entity
 type Post struct {
-	ID       uint   `gorm:"PRIMARY_KEY" json:"id"`
+	ID       string `gorm:"PRIMARY_KEY" json:"id"`
 	Score    int    `json:"score"`
 	Views    uint   `json:"views"`
 	Title    string `gorm:"type:varchar(100)" json:"title"`

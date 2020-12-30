@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/Kalinin-Andrey/redditclone/internal/pkg/auth"
 	"log"
 	"net/http"
+	"redditclone/internal/pkg/auth"
 	"time"
 
 	"github.com/go-ozzo/ozzo-routing/v2"
@@ -12,12 +12,12 @@ import (
 	"github.com/go-ozzo/ozzo-routing/v2/file"
 	"github.com/go-ozzo/ozzo-routing/v2/slash"
 
-	"github.com/Kalinin-Andrey/redditclone/pkg/accesslog"
-	"github.com/Kalinin-Andrey/redditclone/pkg/config"
-	"github.com/Kalinin-Andrey/redditclone/pkg/errorshandler"
+	"redditclone/internal/pkg/accesslog"
+	"redditclone/internal/pkg/config"
+	"redditclone/internal/pkg/errorshandler"
 
-	commonApp "github.com/Kalinin-Andrey/redditclone/internal/app"
-	"github.com/Kalinin-Andrey/redditclone/internal/app/api/controller"
+	commonApp "redditclone/internal/app"
+	"redditclone/internal/app/api/controller"
 )
 
 // Version of API
@@ -72,14 +72,14 @@ func (app *App) buildHandler() *routing.Router {
 
 	rg := router.Group("/api")
 
-	authHandler := auth.Handler(app.Cfg.JWTSigningKey, app.DB, app.Logger, app.SessionRepository)
+	authMiddleware := auth.Middleware(app.Logger, app.Auth.Service)
 
 	auth.RegisterHandlers(rg.Group(""),
-		auth.NewService(app.Cfg.JWTSigningKey, app.Cfg.JWTExpiration, app.Domain.User.Service, app.Logger),
+		app.Auth.Service,
 		app.Logger,
 	)
 
-	app.RegisterHandlers(rg, authHandler)
+	app.RegisterHandlers(rg, authMiddleware)
 
 	return router
 }
@@ -108,11 +108,11 @@ func (app *App) Run() error {
 }
 
 // RegisterHandlers sets up the routing of the HTTP handlers.
-func (app *App) RegisterHandlers(rg *routing.RouteGroup, authHandler routing.Handler) {
+func (app *App) RegisterHandlers(rg *routing.RouteGroup, authMiddleware routing.Handler) {
 
-	//controller.RegisterUserHandlers(rg, app.Domain.User.Service, app.Logger, authHandler)
-	controller.RegisterPostHandlers(rg, app.Domain.Post.Service, app.Domain.User.Service, app.Logger, authHandler)
-	controller.RegisterCommentHandlers(rg, app.Domain.Comment.Service, app.Domain.Post.Service, app.Logger, authHandler)
-	controller.RegisterVoteHandlers(rg, app.Domain.Vote.Service, app.Domain.Post.Service, app.Logger, authHandler)
+	//controller.RegisterUserHandlers(rg, app.Domain.User.Service, app.Logger, authMiddleware)
+	controller.RegisterPostHandlers(rg, app.Domain.Post.Service, app.Domain.User.Service, app.Logger, authMiddleware)
+	controller.RegisterCommentHandlers(rg, app.Domain.Comment.Service, app.Domain.Post.Service, app.Logger, authMiddleware)
+	controller.RegisterVoteHandlers(rg, app.Domain.Vote.Service, app.Domain.Post.Service, app.Logger, authMiddleware)
 
 }
