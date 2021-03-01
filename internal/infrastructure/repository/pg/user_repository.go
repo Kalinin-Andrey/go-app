@@ -57,8 +57,7 @@ func (r UserRepository) Query(ctx context.Context, offset, limit uint) ([]user.U
 	return items, err
 }
 
-// Create saves a new album record in the database.
-// It returns the ID of the newly inserted album record.
+// Create saves a new user record in the database.
 func (r UserRepository) Create(ctx context.Context, entity *user.User) error {
 
 	if !r.db.DB().NewRecord(entity) {

@@ -2,7 +2,13 @@ package config
 
 import (
 	"flag"
+
 	"github.com/pkg/errors"
+
+	"github.com/minipkg/go-app-common/db/mongo"
+	"github.com/minipkg/go-app-common/db/pg"
+	"github.com/minipkg/go-app-common/db/redis"
+	"github.com/minipkg/go-app-common/log"
 
 	"github.com/spf13/viper"
 )
@@ -12,7 +18,7 @@ type Configuration struct {
 	Server struct {
 		HTTPListen string
 	}
-	Log Log
+	Log log.Config
 	DB  DB
 	// JWT signing key. required.
 	JWTSigningKey string
@@ -23,37 +29,9 @@ type Configuration struct {
 }
 
 type DB struct {
-	Pg    Pg
-	Mongo Mongo
-	Redis Redis
-}
-
-// Log is config for a logger
-type Log struct {
-	Encoding      string
-	OutputPaths   []string
-	Level         string
-	InitialFields map[string]interface{}
-}
-
-// Pg is config for a DB connection
-type Pg struct {
-	Dialect       string
-	DSN           string
-	IsLogMode     bool
-	IsAutoMigrate bool
-}
-
-type Mongo struct {
-	DSN    string
-	DBName string
-}
-
-type Redis struct {
-	Addrs    []string
-	Login    string
-	Password string
-	DBName   int
+	Pg    pg.Config
+	Mongo mongo.Config
+	Redis redis.Config
 }
 
 // defaultPathToConfig is the default path to the app config
@@ -111,18 +89,18 @@ func Get4Test(logAppPostfix string) (*Configuration, error) {
 
 func Get4UnitTest(logAppPostfix string) *Configuration {
 	cfg := &Configuration{
-		Log: Log{
+		Log: log.Config{
 			Encoding: "json",
 		},
 		DB: DB{
-			Pg: Pg{
+			Pg: pg.Config{
 				Dialect:       "postgres",
 				DSN:           "host=localhost port=5401 dbname=postgres user=postgres password=postgres sslmode=disable",
 				IsLogMode:     true,
 				IsAutoMigrate: true,
 			},
-			Mongo: Mongo{},
-			Redis: Redis{},
+			Mongo: mongo.Config{},
+			Redis: redis.Config{},
 		},
 		JWTSigningKey:   "test",
 		JWTExpiration:   1,
