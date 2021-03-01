@@ -15,8 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	dbredis "redditclone/internal/pkg/db/redis"
-	dbmockredis "redditclone/internal/pkg/mock/db/redis"
+	dbredis "github.com/minipkg/go-app-common/db/redis"
+	dbmockredis "github.com/minipkg/go-app-common/db/redis/mock"
 
 	"redditclone/internal/domain/user"
 )

@@ -10,9 +10,9 @@ import (
 	"redditclone/internal/pkg/session"
 	"time"
 
+	"github.com/minipkg/go-app-common/log"
 	"redditclone/internal/domain/user"
 	"redditclone/internal/pkg/errorshandler"
-	"redditclone/internal/pkg/log"
 )
 
 // Service encapsulates the authentication logic.

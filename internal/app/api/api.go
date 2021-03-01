@@ -12,7 +12,7 @@ import (
 	"github.com/go-ozzo/ozzo-routing/v2/file"
 	"github.com/go-ozzo/ozzo-routing/v2/slash"
 
-	"redditclone/internal/pkg/accesslog"
+	"github.com/minipkg/go-app-common/accesslog"
 	"redditclone/internal/pkg/config"
 	"redditclone/internal/pkg/errorshandler"
 

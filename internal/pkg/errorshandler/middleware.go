@@ -10,7 +10,7 @@ import (
 	routing "github.com/go-ozzo/ozzo-routing/v2"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 
-	"redditclone/internal/pkg/log"
+	"github.com/minipkg/go-app-common/log"
 )
 
 // Handler creates a middleware that handles panics and errors encountered during HTTP request processing.

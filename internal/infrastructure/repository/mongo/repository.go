@@ -3,8 +3,8 @@ package mongo
 import (
 	"github.com/pkg/errors"
 
-	mongodb "redditclone/internal/pkg/db/mongo"
-	"redditclone/internal/pkg/log"
+	mongodb "github.com/minipkg/go-app-common/db/mongo"
+	"github.com/minipkg/go-app-common/log"
 
 	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"

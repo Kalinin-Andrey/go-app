@@ -7,9 +7,9 @@ import (
 	"redditclone/internal/domain"
 	"redditclone/internal/domain/user"
 
-	"redditclone/internal/pkg/log"
+	"github.com/minipkg/go-app-common/log"
 
-	"redditclone/internal/pkg/db/pg"
+	"github.com/minipkg/go-app-common/db/pg"
 )
 
 // IRepository is an interface of repository

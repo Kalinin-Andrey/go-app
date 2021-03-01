@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-ozzo/ozzo-routing/v2"
 
-	"redditclone/internal/pkg/log"
+	"github.com/minipkg/go-app-common/log"
 
 	"redditclone/internal/domain/post"
 )

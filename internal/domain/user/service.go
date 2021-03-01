@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"redditclone/internal/domain"
 
-	"redditclone/internal/pkg/log"
+	"github.com/minipkg/go-app-common/log"
 )
 
 const MaxLIstLimit = 1000

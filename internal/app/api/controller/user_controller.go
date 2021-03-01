@@ -7,8 +7,8 @@ import (
 	"redditclone/internal/pkg/errorshandler"
 	"strconv"
 
+	"github.com/minipkg/go-app-common/log"
 	"redditclone/internal/domain/user"
-	"redditclone/internal/pkg/log"
 )
 
 type userController struct {

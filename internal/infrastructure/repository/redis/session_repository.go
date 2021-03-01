@@ -10,9 +10,9 @@ import (
 	goredis "github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 
+	"github.com/minipkg/go-app-common/db/redis"
 	"redditclone/internal/pkg/apperror"
 	"redditclone/internal/pkg/auth"
-	"redditclone/internal/pkg/db/redis"
 	"redditclone/internal/pkg/session"
 
 	"redditclone/internal/domain/user"

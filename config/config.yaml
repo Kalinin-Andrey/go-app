@@ -13,15 +13,15 @@ log:
 db:
   pg:
     dialect:        "postgres"
-    dsn:            "host=localhost port=5401 dbname=postgres user=postgres password=postgres sslmode=disable"
+    dsn:            "host=pg port=5401 dbname=postgres user=postgres password=postgres sslmode=disable"
     islogmode:      True
     isautomigrate:  True
   mongo:
-    dsn:      "mongodb://root:root@localhost:27017"
+    dsn:      "mongodb://root:root@mongo:27017"
     dbname:   "db"
   redis:
     addrs:
-      - "localhost:6379"
+      - "redis:6379"
     login:    ""
     password: ""
     dbname:   0

@@ -1,8 +1,8 @@
 package redis
 
 import (
+	"github.com/minipkg/go-app-common/db/redis"
 	"redditclone/internal/domain"
-	"redditclone/internal/pkg/db/redis"
 )
 
 // IRepository is an interface of repository

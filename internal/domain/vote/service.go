@@ -2,9 +2,9 @@ package vote
 
 import (
 	"context"
+	"github.com/minipkg/go-app-common/log"
 	"github.com/pkg/errors"
 	"redditclone/internal/domain"
-	"redditclone/internal/pkg/log"
 )
 
 const MaxLIstLimit = 1000
@@ -45,7 +45,7 @@ func (s service) defaultConditions() domain.DBQueryConditions {
 
 func (s service) NewEntity(userId uint, postId string, val int) *Vote {
 	return &Vote{
-		UserID:	userId,
+		UserID: userId,
 		PostID: postId,
 		Value:  val,
 	}

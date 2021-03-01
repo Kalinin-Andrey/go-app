@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/minipkg/go-app-common/log"
 	"redditclone/internal/pkg/config"
 	"redditclone/internal/pkg/jwt"
-	"redditclone/internal/pkg/log"
 	repositoryMock "redditclone/internal/pkg/mock/repository"
 
 	commonapp "redditclone/internal/app"

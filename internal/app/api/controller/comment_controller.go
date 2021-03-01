@@ -9,7 +9,7 @@ import (
 	"redditclone/internal/pkg/auth"
 	"redditclone/internal/pkg/errorshandler"
 
-	"redditclone/internal/pkg/log"
+	"github.com/minipkg/go-app-common/log"
 )
 
 type commentController struct {

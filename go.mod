@@ -25,7 +25,7 @@ require (
 	github.com/klauspost/compress v1.11.9 // indirect
 	github.com/lib/pq v1.9.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
-	github.com/minipkg/go-app-common v0.0.0-20210301155731-e3cb2e1b47af // indirect
+	github.com/minipkg/go-app-common v0.0.0-20210301155731-e3cb2e1b47af
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1

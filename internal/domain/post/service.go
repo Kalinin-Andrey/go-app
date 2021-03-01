@@ -2,13 +2,13 @@ package post
 
 import (
 	"context"
+	"github.com/minipkg/go-app-common/log"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/vote"
 	"redditclone/internal/pkg/apperror"
-	"redditclone/internal/pkg/log"
 )
 
 const MaxLIstLimit = 1000
@@ -61,7 +61,7 @@ func (s service) NewEntity() *Post {
 
 func (s service) NewVoteEntity(userId uint, postId string, val int) *vote.Vote {
 	return &vote.Vote{
-		UserID:	userId,
+		UserID: userId,
 		PostID: postId,
 		Value:  val,
 	}
