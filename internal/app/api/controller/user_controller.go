@@ -1,13 +1,17 @@
 package controller
 
 import (
-	"github.com/go-ozzo/ozzo-routing/v2"
-	"github.com/pkg/errors"
-	"redditclone/internal/pkg/apperror"
-	"redditclone/internal/pkg/errorshandler"
+
 	"strconv"
 
+	"github.com/pkg/errors"
+
+	"github.com/go-ozzo/ozzo-routing/v2"
 	"github.com/minipkg/go-app-common/log"
+
+	"redditclone/internal/pkg/apperror"
+	"redditclone/internal/pkg/errorshandler"
+
 	"redditclone/internal/domain/user"
 )
 

@@ -2,11 +2,13 @@ package pg
 
 import (
 	"context"
+
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 
-	"redditclone/internal/domain/user"
 	"redditclone/internal/pkg/apperror"
+
+	"redditclone/internal/domain/user"
 )
 
 // UserRepository is a repository for the user entity

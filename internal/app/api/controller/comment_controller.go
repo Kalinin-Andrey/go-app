@@ -1,19 +1,20 @@
 package controller
 
 import (
-	"github.com/go-ozzo/ozzo-routing/v2"
 	"net/http"
+
+	"github.com/go-ozzo/ozzo-routing/v2"
+	"github.com/minipkg/go-app-common/log"
+
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/post"
 	"redditclone/internal/pkg/apperror"
 	"redditclone/internal/pkg/auth"
 	"redditclone/internal/pkg/errorshandler"
 
-	"github.com/minipkg/go-app-common/log"
 )
 
 type commentController struct {
-	Controller
 	Service     comment.IService
 	PostService post.IService
 	Logger      log.ILogger

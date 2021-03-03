@@ -8,7 +8,6 @@ import (
 )
 
 type voteController struct {
-	Controller
 	Service     vote.IService
 	PostService post.IService
 	Logger      log.ILogger

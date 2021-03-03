@@ -2,9 +2,12 @@ package post
 
 import (
 	"context"
-	"github.com/minipkg/go-app-common/log"
+
 	"github.com/pkg/errors"
+
+	"github.com/minipkg/go-app-common/log"
 	"go.mongodb.org/mongo-driver/mongo"
+
 	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/vote"

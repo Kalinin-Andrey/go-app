@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"github.com/pkg/errors"
+	"reflect"
 	"strings"
 
 	"github.com/google/uuid"
@@ -79,11 +80,23 @@ func (r PostRepository) Query(ctx context.Context, cond domain.DBQueryConditions
 	var err error
 	items := []post.Post{}
 	condition	:= bson.M{}
-
-	for k, v := range cond.Where {
-		condition[strings.ToLower(k)] = v
+	empty		:= post.Post{}
+	where, ok := cond.Where.(*post.Post)
+	if !ok {
+		return nil, errors.Wrapf(apperror.ErrInternal, "Can not assign where condition to Post type. Where condition: %v", cond.Where)
 	}
-	// bson.M{"postid": cond.Where["PostID"].(string)}
+
+	v := reflect.ValueOf(where).Elem()
+	t := v.Type()
+	e := reflect.ValueOf(empty)
+	for i := 0; i < t.NumField(); i++ {
+		value		:= v.Field(i).Interface()
+		emptyValue	:= e.Field(i).Interface()
+
+		if value != emptyValue {
+			condition[strings.ToLower(t.Field(i).Name)] = value
+		}
+	}
 
 	cursor, err := r.collection.Find(ctx, condition)
 	if err != nil {

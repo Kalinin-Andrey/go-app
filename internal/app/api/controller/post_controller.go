@@ -1,23 +1,25 @@
 package controller
 
 import (
-	"github.com/pkg/errors"
 	"net/http"
-	"redditclone/internal/domain/user"
-	"redditclone/internal/domain/vote"
+	"redditclone/internal/domain"
+
+	"github.com/pkg/errors"
+
+	"github.com/go-ozzo/ozzo-routing/v2"
+	"github.com/minipkg/go-app-common/log"
+	"github.com/minipkg/go-app-common/ozzo_handler"
+
 	"redditclone/internal/pkg/apperror"
 	"redditclone/internal/pkg/auth"
 	"redditclone/internal/pkg/errorshandler"
 
-	"github.com/go-ozzo/ozzo-routing/v2"
-
-	"github.com/minipkg/go-app-common/log"
-
 	"redditclone/internal/domain/post"
+	"redditclone/internal/domain/user"
+	"redditclone/internal/domain/vote"
 )
 
 type postController struct {
-	Controller
 	Service     post.IService
 	UserService user.IService
 	Logger      log.ILogger
@@ -80,33 +82,41 @@ func (c postController) get(ctx *routing.Context) error {
 
 // list method is for a getting a list of all entities
 func (c postController) list(ctx *routing.Context) error {
-	query := c.ExtractQueryFromRoutingContext(ctx)
 	rctx := ctx.Request.Context()
 
-	for key, val := range query.Where {
-		if key == "userName" {
-			// @todo: make case insensitive
-			userName, ok := val.(string)
-			if !ok {
-				return errors.Errorf("Can not assert interface{} to string for value: %#v", val)
-			}
-			user, err := c.UserService.First(rctx, &user.User{
-				Name: userName,
-			})
-			if err != nil {
-				if err == apperror.ErrNotFound {
-					c.Logger.With(ctx.Request.Context()).Info(errors.Wrapf(err, "Can not find user with name: %q", userName))
-					return errorshandler.NotFound("Can not find user")
-				}
-				c.Logger.With(ctx.Request.Context()).Error(err)
-				return errorshandler.InternalServerError("")
-			}
-			delete(query.Where, "userName")
-			query.Where["UserID"] = user.ID
+	cond := domain.DBQueryConditions{
+		SortOrder: map[string]string{
+			"id": "asc",
+		},
+	}
+	where := c.Service.NewEntity()
+
+	if len(ctx.Request.URL.Query()) > 0 {
+		err := ozzo_handler.ParseQueryParams(ctx, where)
+		if err != nil {
+			c.Logger.With(ctx.Request.Context()).Info(err)
+			return errorshandler.BadRequest("")
 		}
 	}
 
-	items, err := c.Service.Query(rctx, query)
+	if userName := ctx.Param("userName"); userName != "" {
+		// @todo: make case insensitive
+		user, err := c.UserService.First(rctx, &user.User{
+			Name: userName,
+		})
+		if err != nil {
+			if err == apperror.ErrNotFound {
+				c.Logger.With(ctx.Request.Context()).Info(errors.Wrapf(err, "Can not find user with name: %q", userName))
+				return errorshandler.NotFound("Can not find user")
+			}
+			c.Logger.With(ctx.Request.Context()).Error(err)
+			return errorshandler.InternalServerError("")
+		}
+		where.UserID = user.ID
+	}
+	cond.Where = where
+
+	items, err := c.Service.Query(rctx, cond)
 	if err != nil {
 		if err == apperror.ErrNotFound {
 			c.Logger.With(ctx.Request.Context()).Info(err)
