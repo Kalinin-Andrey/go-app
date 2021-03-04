@@ -145,7 +145,7 @@ func (s *ApiTestSuite) TestPost_List() {
 
 	list := []post.Post{*s.entities.post}
 	query := domain.DBQueryConditions{
-		Where: map[string]interface{}{},
+		Where: &post.Post{},
 	}
 
 	s.repositoryMocks.post.On("Query", mock.Anything, query).Return(list, error(nil))
@@ -183,8 +183,8 @@ func (s *ApiTestSuite) TestPost_ListByCategory() {
 
 	list := []post.Post{*s.entities.post}
 	query := domain.DBQueryConditions{
-		Where: map[string]interface{}{
-			"category": "category",
+		Where: &post.Post{
+			Category: "category",
 		},
 	}
 
@@ -226,8 +226,8 @@ func (s *ApiTestSuite) TestPost_ListByUser() {
 		Name: s.entities.user.Name,
 	}
 	query := domain.DBQueryConditions{
-		Where: map[string]interface{}{
-			"UserID": s.entities.user.ID,
+		Where: &post.Post{
+			UserID: s.entities.user.ID,
 		},
 	}
 

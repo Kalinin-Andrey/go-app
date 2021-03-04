@@ -104,8 +104,8 @@ func (s *VoteRepositoryTestSuite) TestQuery() {
 		Res: items,
 	}
 	condition := domain.DBQueryConditions{
-		Where: map[string]interface{}{
-			"PostID": s.vote.PostID,
+		Where: &vote.Vote{
+			PostID: s.vote.PostID,
 		},
 	}
 	s.voteCollectionMock.On("Find", s.ctx, bson.M{"postid": s.vote.PostID}, []*options.FindOptions(nil)).Return(cursor, error(nil))

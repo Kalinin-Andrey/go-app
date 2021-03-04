@@ -2,9 +2,11 @@ package mongo
 
 import (
 	"context"
-	"github.com/google/uuid"
+
 	"github.com/pkg/errors"
 
+	"github.com/google/uuid"
+	mongoutil "github.com/minipkg/go-app-common/db/mongo/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -44,8 +46,9 @@ func (r CommentRepository) Get(ctx context.Context, id string) (*comment.Comment
 func (r CommentRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]comment.Comment, error) {
 	items := []comment.Comment{}
 	var err error
+	condition := mongoutil.QueryWhereCondition(cond.Where)
 
-	cursor, err := r.collection.Find(ctx, bson.M{"postid": cond.Where["PostID"].(string)})
+	cursor, err := r.collection.Find(ctx, condition)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return items, apperror.ErrNotFound

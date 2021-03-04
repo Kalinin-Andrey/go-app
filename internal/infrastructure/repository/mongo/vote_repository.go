@@ -2,10 +2,11 @@ package mongo
 
 import (
 	"context"
+
 	"github.com/pkg/errors"
 
 	"github.com/google/uuid"
-
+	mongoutil "github.com/minipkg/go-app-common/db/mongo/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -45,8 +46,9 @@ func (r VoteRepository) Get(ctx context.Context, id string) (*vote.Vote, error) 
 func (r VoteRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]vote.Vote, error) {
 	items := []vote.Vote{}
 	var err error
+	condition := mongoutil.QueryWhereCondition(cond.Where)
 
-	cursor, err := r.collection.Find(ctx, bson.M{"postid": cond.Where["PostID"].(string)})
+	cursor, err := r.collection.Find(ctx, condition)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return items, apperror.ErrNotFound
@@ -64,7 +66,7 @@ func (r VoteRepository) Query(ctx context.Context, cond domain.DBQueryConditions
 
 // Create saves a new album record in the database.
 // It returns the ID of the newly inserted album record.
-	func (r VoteRepository) Create(ctx context.Context, entity *vote.Vote) error {
+func (r VoteRepository) Create(ctx context.Context, entity *vote.Vote) error {
 	if entity.ID != "" {
 		return errors.Wrap(apperror.ErrBadRequest, "entity is not new")
 	}

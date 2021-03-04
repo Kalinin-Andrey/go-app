@@ -103,8 +103,8 @@ func (s *CommentRepositoryTestSuite) TestQuery() {
 		Res: items,
 	}
 	condition := domain.DBQueryConditions{
-		Where: map[string]interface{}{
-			"PostID": s.comment.PostID,
+		Where: &comment.Comment{
+			PostID: s.comment.PostID,
 		},
 	}
 	s.commentCollectionMock.On("Find", s.ctx, bson.M{"postid": s.comment.PostID}, []*options.FindOptions(nil)).Return(cursor, error(nil))

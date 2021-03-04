@@ -2,12 +2,12 @@ package mongo
 
 import (
 	"context"
+	"redditclone/internal/domain/comment"
+
 	"github.com/pkg/errors"
-	"reflect"
-	"strings"
 
 	"github.com/google/uuid"
-
+	mongoutil "github.com/minipkg/go-app-common/db/mongo/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -56,16 +56,19 @@ func (r PostRepository) Get(ctx context.Context, id string) (*post.Post, error) 
 }
 
 func (r PostRepository) populate(ctx context.Context, item *post.Post) (err error) {
-	cond := domain.DBQueryConditions{
-		Where: map[string]interface{}{"PostID": item.ID},
+	commentCond := domain.DBQueryConditions{
+		Where: &comment.Comment{PostID: item.ID},
+	}
+	voteCond := domain.DBQueryConditions{
+		Where: &comment.Comment{PostID: item.ID},
 	}
 
-	comments, err := r.commentRepository.Query(ctx, cond)
+	comments, err := r.commentRepository.Query(ctx, commentCond)
 	if err != nil {
 		return err
 	}
 
-	votes, err := r.voteRepository.Query(ctx, cond)
+	votes, err := r.voteRepository.Query(ctx, voteCond)
 	if err != nil {
 		return err
 	}
@@ -79,24 +82,7 @@ func (r PostRepository) populate(ctx context.Context, item *post.Post) (err erro
 func (r PostRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]post.Post, error) {
 	var err error
 	items := []post.Post{}
-	condition	:= bson.M{}
-	empty		:= post.Post{}
-	where, ok := cond.Where.(*post.Post)
-	if !ok {
-		return nil, errors.Wrapf(apperror.ErrInternal, "Can not assign where condition to Post type. Where condition: %v", cond.Where)
-	}
-
-	v := reflect.ValueOf(where).Elem()
-	t := v.Type()
-	e := reflect.ValueOf(empty)
-	for i := 0; i < t.NumField(); i++ {
-		value		:= v.Field(i).Interface()
-		emptyValue	:= e.Field(i).Interface()
-
-		if value != emptyValue {
-			condition[strings.ToLower(t.Field(i).Name)] = value
-		}
-	}
+	condition := mongoutil.QueryWhereCondition(cond.Where)
 
 	cursor, err := r.collection.Find(ctx, condition)
 	if err != nil {

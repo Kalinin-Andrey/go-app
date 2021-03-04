@@ -164,8 +164,8 @@ func (s *PostRepositoryTestSuite) TestQuery() {
 		Res: posts,
 	}
 	condition := domain.DBQueryConditions{
-		Where: map[string]interface{}{
-			"UserID": s.post.UserID,
+		Where: &post.Post{
+			UserID: s.post.UserID,
 		},
 	}
 	s.populatePost()

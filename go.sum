@@ -363,6 +363,12 @@ github.com/minipkg/go-app-common v0.0.0-20210301143439-da38da6b4f89 h1:z1CVX7f4n
 github.com/minipkg/go-app-common v0.0.0-20210301143439-da38da6b4f89/go.mod h1:CLzkhmP0TV+Z9OZWpWti7AR4PaxQUz1zoBlOWBL5o78=
 github.com/minipkg/go-app-common v0.0.0-20210301155731-e3cb2e1b47af h1:n2HQmNlnhsbr+mSdtl8mXUYbTVVQAEsaGASZeaUpeCc=
 github.com/minipkg/go-app-common v0.0.0-20210301155731-e3cb2e1b47af/go.mod h1:/9R/TBMFBrapmGjPPh17gHJvKISr8OLOYwLblLaF26k=
+github.com/minipkg/go-app-common v0.0.0-20210304131459-b6499aed8cca h1:fJPCNSbv3r4c5MQfqpVfOjcGTdXRPlZ/kkG2bvTIqVA=
+github.com/minipkg/go-app-common v0.0.0-20210304131459-b6499aed8cca/go.mod h1:/9R/TBMFBrapmGjPPh17gHJvKISr8OLOYwLblLaF26k=
+github.com/minipkg/go-app-common v0.0.0-20210304141044-11eeeb83a37e h1:nQnOzVLSUk74cSX1znrZn258VyzEOb1m1xOdpPpexfo=
+github.com/minipkg/go-app-common v0.0.0-20210304141044-11eeeb83a37e/go.mod h1:/9R/TBMFBrapmGjPPh17gHJvKISr8OLOYwLblLaF26k=
+github.com/minipkg/go-app-common v0.0.0-20210304165424-04da08310e7c h1:5wgeuOCMyhChH0NXCXkntPYH/hCrolb3Uoh3OF+JJJ0=
+github.com/minipkg/go-app-common v0.0.0-20210304165424-04da08310e7c/go.mod h1:/9R/TBMFBrapmGjPPh17gHJvKISr8OLOYwLblLaF26k=
 github.com/mitchellh/cli v1.0.0/go.mod h1:hNIlj7HEI86fIcpObd7a0FcrxTWetlwJDGcceTlRvqc=
 github.com/mitchellh/copystructure v1.0.0/go.mod h1:SNtv71yrdKgLRyLFxmLdkAbkKEFWgYaq1OVrnRcwhnw=
 github.com/mitchellh/go-homedir v1.0.0 h1:vKb8ShqSby24Yrqr/yDYkuFz8d0WUjys40rvnGC8aR0=
