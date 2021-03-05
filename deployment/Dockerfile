@@ -5,18 +5,24 @@
 FROM golang:1.14 as builder
 
 WORKDIR /go/src/app
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+
 COPY . .
 
 RUN go get -d -v ./...
 RUN go install -v ./...
+RUN CGO_ENABLED=0 go build -o /go/bin/restapi ./cmd/restapi
 
 
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
-WORKDIR /go/src/app
-COPY --from=builder /go/src/app .
+#RUN apk --no-cache add ca-certificates
+WORKDIR /bin
+COPY config /bin/config
+COPY --from=builder /go/bin/restapi .
 
-EXPOSE 8080
+EXPOSE 81
 
-CMD ["server"]
+CMD ["restapi"]

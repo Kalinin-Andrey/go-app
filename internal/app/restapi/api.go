@@ -1,4 +1,4 @@
-package api
+package restapi
 
 import (
 	"log"
@@ -6,18 +6,19 @@ import (
 	"redditclone/internal/pkg/auth"
 	"time"
 
-	"github.com/go-ozzo/ozzo-routing/v2"
+	routing "github.com/go-ozzo/ozzo-routing/v2"
 	"github.com/go-ozzo/ozzo-routing/v2/content"
 	"github.com/go-ozzo/ozzo-routing/v2/cors"
 	"github.com/go-ozzo/ozzo-routing/v2/file"
 	"github.com/go-ozzo/ozzo-routing/v2/slash"
 
-	"github.com/minipkg/go-app-common/accesslog"
 	"redditclone/internal/pkg/config"
 	"redditclone/internal/pkg/errorshandler"
 
+	"github.com/minipkg/go-app-common/accesslog"
+
 	commonApp "redditclone/internal/app"
-	"redditclone/internal/app/api/controller"
+	"redditclone/internal/app/restapi/controller"
 )
 
 // Version of API

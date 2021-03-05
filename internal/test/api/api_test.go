@@ -3,23 +3,25 @@ package api
 import (
 	"context"
 	"encoding/hex"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"redditclone/internal/pkg/session"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/mock"
+
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/minipkg/go-app-common/log"
 	"redditclone/internal/pkg/config"
 	"redditclone/internal/pkg/jwt"
 	repositoryMock "redditclone/internal/pkg/mock/repository"
 
+	"github.com/minipkg/go-app-common/log"
+
 	commonapp "redditclone/internal/app"
-	apiapp "redditclone/internal/app/api"
+	apiapp "redditclone/internal/app/restapi"
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/post"
 	"redditclone/internal/domain/user"

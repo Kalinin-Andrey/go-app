@@ -6,7 +6,7 @@ import (
 	"redditclone/internal/pkg/config"
 
 	commonApp "redditclone/internal/app"
-	"redditclone/internal/app/api"
+	"redditclone/internal/app/restapi"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("Can not load the config")
 	}
-	app := api.New(commonApp.New(*cfg), *cfg)
+	app := restapi.New(commonApp.New(*cfg), *cfg)
 
 	if err := app.Run(); err != nil {
 		log.Fatalf("Error while application is running: %s", err.Error())

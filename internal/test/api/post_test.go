@@ -187,7 +187,7 @@ func (s *ApiTestSuite) TestPost_ListByCategory() {
 
 	list := []post.Post{*s.entities.post}
 	query := domain.DBQueryConditions{
-		Where: &post.Post{ //	сравнение по адресам не проходит
+		Where: &post.Post{
 			Category: "category",
 		},
 		SortOrder: map[string]string{

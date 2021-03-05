@@ -20,7 +20,15 @@ var _ user.Repository = (*UserRepository)(nil)
 
 // New creates a new UserRepository
 func NewUserRepository(repository *repository) (*UserRepository, error) {
-	return &UserRepository{repository: *repository}, nil
+	r := &UserRepository{repository: *repository}
+	r.autoMigrate()
+	return r, nil
+}
+
+func (r UserRepository) autoMigrate() {
+	if r.db.IsAutoMigrate() {
+		r.db.DB().AutoMigrate(&user.User{})
+	}
 }
 
 // Get reads the album with the specified ID from the database.
@@ -59,7 +67,8 @@ func (r UserRepository) Query(ctx context.Context, offset, limit uint) ([]user.U
 	return items, err
 }
 
-// Create saves a new user record in the database.
+// Create saves a new album record in the database.
+// It returns the ID of the newly inserted album record.
 func (r UserRepository) Create(ctx context.Context, entity *user.User) error {
 
 	if !r.db.DB().NewRecord(entity) {
