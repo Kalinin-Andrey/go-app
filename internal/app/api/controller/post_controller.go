@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/go-ozzo/ozzo-routing/v2"
+	routing "github.com/go-ozzo/ozzo-routing/v2"
 	"github.com/minipkg/go-app-common/log"
 	"github.com/minipkg/go-app-common/ozzo_handler"
 
@@ -97,6 +97,10 @@ func (c postController) list(ctx *routing.Context) error {
 			c.Logger.With(ctx.Request.Context()).Info(err)
 			return errorshandler.BadRequest("")
 		}
+	}
+
+	if category := ctx.Param("category"); category != "" {
+		where.Category = category
 	}
 
 	if userName := ctx.Param("userName"); userName != "" {

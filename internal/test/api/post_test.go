@@ -3,9 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"redditclone/internal/domain"
@@ -14,6 +11,10 @@ import (
 	"redditclone/internal/domain/vote"
 	"redditclone/internal/pkg/apperror"
 	"redditclone/internal/pkg/errorshandler"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func (s *ApiTestSuite) TestPost_Create() {
@@ -146,6 +147,9 @@ func (s *ApiTestSuite) TestPost_List() {
 	list := []post.Post{*s.entities.post}
 	query := domain.DBQueryConditions{
 		Where: &post.Post{},
+		SortOrder: map[string]string{
+			"id": "asc",
+		},
 	}
 
 	s.repositoryMocks.post.On("Query", mock.Anything, query).Return(list, error(nil))
@@ -183,8 +187,11 @@ func (s *ApiTestSuite) TestPost_ListByCategory() {
 
 	list := []post.Post{*s.entities.post}
 	query := domain.DBQueryConditions{
-		Where: &post.Post{
+		Where: &post.Post{ //	сравнение по адресам не проходит
 			Category: "category",
+		},
+		SortOrder: map[string]string{
+			"id": "asc",
 		},
 	}
 
@@ -228,6 +235,9 @@ func (s *ApiTestSuite) TestPost_ListByUser() {
 	query := domain.DBQueryConditions{
 		Where: &post.Post{
 			UserID: s.entities.user.ID,
+		},
+		SortOrder: map[string]string{
+			"id": "asc",
 		},
 	}
 
