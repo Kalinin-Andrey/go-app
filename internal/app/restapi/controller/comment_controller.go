@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 
-	"github.com/go-ozzo/ozzo-routing/v2"
+	routing "github.com/go-ozzo/ozzo-routing/v2"
 	"github.com/minipkg/go-app-common/log"
 
 	"redditclone/internal/domain/comment"
@@ -11,7 +11,6 @@ import (
 	"redditclone/internal/pkg/apperror"
 	"redditclone/internal/pkg/auth"
 	"redditclone/internal/pkg/errorshandler"
-
 )
 
 type commentController struct {
@@ -35,7 +34,7 @@ func RegisterCommentHandlers(r *routing.RouteGroup, service comment.IService, po
 	r.Delete(`/post/<postId>/<id>`, c.delete)
 }
 
-func (c commentController) create(ctx *routing.Context) error {
+func (c *commentController) create(ctx *routing.Context) error {
 	postId := ctx.Param("postId")
 
 	entity := c.Service.NewEntity()
@@ -72,7 +71,7 @@ func (c commentController) create(ctx *routing.Context) error {
 	return ctx.WriteWithStatus(post, http.StatusCreated)
 }
 
-func (c commentController) delete(ctx *routing.Context) error {
+func (c *commentController) delete(ctx *routing.Context) error {
 	postId := ctx.Param("postId")
 	id := ctx.Param("id")
 

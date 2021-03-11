@@ -3,7 +3,7 @@ package comment
 import (
 	"time"
 
-	"github.com/go-ozzo/ozzo-validation/v4"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 
 	"redditclone/internal/domain/user"
 )

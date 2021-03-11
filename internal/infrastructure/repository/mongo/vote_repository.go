@@ -31,7 +31,7 @@ func NewVoteRepository(repository *repository) (*VoteRepository, error) {
 }
 
 // Get reads the recordset with the specified ID from the database.
-func (r VoteRepository) Get(ctx context.Context, id string) (*vote.Vote, error) {
+func (r *VoteRepository) Get(ctx context.Context, id string) (*vote.Vote, error) {
 	entity := &vote.Vote{}
 	err := r.collection.FindOne(ctx, bson.M{"id": id}).Decode(entity)
 	if err != nil {
@@ -43,7 +43,7 @@ func (r VoteRepository) Get(ctx context.Context, id string) (*vote.Vote, error) 
 }
 
 // Query retrieves records with the specified offset and limit from the database.
-func (r VoteRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]vote.Vote, error) {
+func (r *VoteRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]vote.Vote, error) {
 	items := []vote.Vote{}
 	var err error
 	condition := mongoutil.QueryWhereCondition(cond.Where)
@@ -66,7 +66,7 @@ func (r VoteRepository) Query(ctx context.Context, cond domain.DBQueryConditions
 
 // Create saves a new album record in the database.
 // It returns the ID of the newly inserted album record.
-func (r VoteRepository) Create(ctx context.Context, entity *vote.Vote) error {
+func (r *VoteRepository) Create(ctx context.Context, entity *vote.Vote) error {
 	if entity.ID != "" {
 		return errors.Wrap(apperror.ErrBadRequest, "entity is not new")
 	}
@@ -82,7 +82,7 @@ func (r VoteRepository) Create(ctx context.Context, entity *vote.Vote) error {
 	return nil
 }
 
-func (r VoteRepository) Update(ctx context.Context, entity *vote.Vote) error {
+func (r *VoteRepository) Update(ctx context.Context, entity *vote.Vote) error {
 	if entity.ID == "" {
 		return errors.Wrap(apperror.ErrBadRequest, "entity is new")
 	}
@@ -100,7 +100,7 @@ func (r VoteRepository) Update(ctx context.Context, entity *vote.Vote) error {
 }
 
 // Delete deletes an entity with the specified ID from the database.
-func (r VoteRepository) Delete(ctx context.Context, id string) error {
+func (r *VoteRepository) Delete(ctx context.Context, id string) error {
 
 	res, err := r.collection.DeleteOne(ctx, bson.M{"id": id})
 	if err != nil {
@@ -113,7 +113,7 @@ func (r VoteRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r VoteRepository) First(ctx context.Context, entity *vote.Vote) (*vote.Vote, error) {
+func (r *VoteRepository) First(ctx context.Context, entity *vote.Vote) (*vote.Vote, error) {
 	vote := &vote.Vote{}
 
 	err := r.collection.FindOne(ctx, bson.M{"userid": entity.UserID, "postid": entity.PostID}).Decode(vote)

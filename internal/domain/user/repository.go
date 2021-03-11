@@ -12,7 +12,7 @@ type Repository interface {
 	// Count returns the number of albums.
 	//Count(ctx context.Context) (uint, error)
 	// Query returns the list of albums with the given offset and limit.
-	//Query(ctx context.Context, offset, limit uint) ([]User, error)
+	Query(ctx context.Context, cond domain.DBQueryConditions) ([]User, error)
 	SetDefaultConditions(conditions domain.DBQueryConditions)
 	// Create saves a new album in the storage.
 	Create(ctx context.Context, entity *User) error

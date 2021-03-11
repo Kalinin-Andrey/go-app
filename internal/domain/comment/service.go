@@ -2,9 +2,10 @@ package comment
 
 import (
 	"context"
+	"redditclone/internal/domain"
+
 	"github.com/minipkg/go-app-common/log"
 	"github.com/pkg/errors"
-	"redditclone/internal/domain"
 )
 
 const MaxLIstLimit = 1000
@@ -39,16 +40,16 @@ func NewService(logger log.ILogger, repo Repository) IService {
 }
 
 // Defaults returns defaults params
-func (s service) defaultConditions() domain.DBQueryConditions {
+func (s *service) defaultConditions() domain.DBQueryConditions {
 	return domain.DBQueryConditions{}
 }
 
-func (s service) NewEntity() *Comment {
+func (s *service) NewEntity() *Comment {
 	return &Comment{}
 }
 
 // Get returns the entity with the specified ID.
-func (s service) Get(ctx context.Context, id string) (*Comment, error) {
+func (s *service) Get(ctx context.Context, id string) (*Comment, error) {
 	entity, err := s.repository.Get(ctx, id)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not get a comment by id: %v", id)
@@ -58,12 +59,12 @@ func (s service) Get(ctx context.Context, id string) (*Comment, error) {
 
 /*
 // Count returns the number of items.
-func (s service) Count(ctx context.Context) (uint, error) {
+func (s *service) Count(ctx context.Context) (uint, error) {
 	return s.repository.Count(ctx)
 }*/
 
 // Query returns the items with the specified offset and limit.
-func (s service) Query(ctx context.Context, offset, limit uint) ([]Comment, error) {
+func (s *service) Query(ctx context.Context, offset, limit uint) ([]Comment, error) {
 	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of comments by ctx")
@@ -72,7 +73,7 @@ func (s service) Query(ctx context.Context, offset, limit uint) ([]Comment, erro
 }
 
 // List returns the items list.
-func (s service) List(ctx context.Context) ([]Comment, error) {
+func (s *service) List(ctx context.Context) ([]Comment, error) {
 	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of comments by ctx")
@@ -80,10 +81,10 @@ func (s service) List(ctx context.Context) ([]Comment, error) {
 	return items, nil
 }
 
-func (s service) Create(ctx context.Context, entity *Comment) error {
+func (s *service) Create(ctx context.Context, entity *Comment) error {
 	return s.repository.Create(ctx, entity)
 }
 
-func (s service) Delete(ctx context.Context, id string) error {
+func (s *service) Delete(ctx context.Context, id string) error {
 	return s.repository.Delete(ctx, id)
 }

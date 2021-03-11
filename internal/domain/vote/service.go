@@ -2,9 +2,10 @@ package vote
 
 import (
 	"context"
+	"redditclone/internal/domain"
+
 	"github.com/minipkg/go-app-common/log"
 	"github.com/pkg/errors"
-	"redditclone/internal/domain"
 )
 
 const MaxLIstLimit = 1000
@@ -39,11 +40,11 @@ func NewService(logger log.ILogger, repo Repository) IService {
 }
 
 // Defaults returns defaults params
-func (s service) defaultConditions() domain.DBQueryConditions {
+func (s *service) defaultConditions() domain.DBQueryConditions {
 	return domain.DBQueryConditions{}
 }
 
-func (s service) NewEntity(userId uint, postId string, val int) *Vote {
+func (s *service) NewEntity(userId uint, postId string, val int) *Vote {
 	return &Vote{
 		UserID: userId,
 		PostID: postId,
@@ -52,7 +53,7 @@ func (s service) NewEntity(userId uint, postId string, val int) *Vote {
 }
 
 // Get returns the entity with the specified ID.
-func (s service) Get(ctx context.Context, id string) (*Vote, error) {
+func (s *service) Get(ctx context.Context, id string) (*Vote, error) {
 	entity, err := s.repository.Get(ctx, id)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not get a vote by id: %v", id)
@@ -62,12 +63,12 @@ func (s service) Get(ctx context.Context, id string) (*Vote, error) {
 
 /*
 // Count returns the number of items.
-func (s service) Count(ctx context.Context) (uint, error) {
+func (s *service) Count(ctx context.Context) (uint, error) {
 	return s.repository.Count(ctx)
 }*/
 
 // Query returns the items with the specified offset and limit.
-func (s service) Query(ctx context.Context, offset, limit uint) ([]Vote, error) {
+func (s *service) Query(ctx context.Context, offset, limit uint) ([]Vote, error) {
 	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of votes by ctx")
@@ -76,7 +77,7 @@ func (s service) Query(ctx context.Context, offset, limit uint) ([]Vote, error) 
 }
 
 // List returns the items list.
-func (s service) List(ctx context.Context) ([]Vote, error) {
+func (s *service) List(ctx context.Context) ([]Vote, error) {
 	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of votes by ctx")
@@ -84,18 +85,18 @@ func (s service) List(ctx context.Context) ([]Vote, error) {
 	return items, nil
 }
 
-func (s service) First(ctx context.Context, entity *Vote) (*Vote, error) {
+func (s *service) First(ctx context.Context, entity *Vote) (*Vote, error) {
 	return s.repository.First(ctx, entity)
 }
 
-func (s service) Create(ctx context.Context, entity *Vote) error {
+func (s *service) Create(ctx context.Context, entity *Vote) error {
 	return s.repository.Create(ctx, entity)
 }
 
-func (s service) Update(ctx context.Context, entity *Vote) error {
+func (s *service) Update(ctx context.Context, entity *Vote) error {
 	return s.repository.Update(ctx, entity)
 }
 
-func (s service) Delete(ctx context.Context, id string) error {
+func (s *service) Delete(ctx context.Context, id string) error {
 	return s.repository.Delete(ctx, id)
 }

@@ -45,6 +45,10 @@ func (m *userRepoMock) SetDefaultConditions(conditions domain.DBQueryConditions)
 
 }
 
+func (m *userRepoMock) Query(ctx context.Context, cond domain.DBQueryConditions) ([]user.User, error) {
+	return nil, nil
+}
+
 func (m *userRepoMock) Get(ctx context.Context, id uint) (*user.User, error) {
 	return m.user, nil
 }

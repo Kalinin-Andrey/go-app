@@ -31,7 +31,7 @@ func NewCommentRepository(repository *repository) (*CommentRepository, error) {
 }
 
 // Get reads the recordset with the specified ID from the database.
-func (r CommentRepository) Get(ctx context.Context, id string) (*comment.Comment, error) {
+func (r *CommentRepository) Get(ctx context.Context, id string) (*comment.Comment, error) {
 	entity := &comment.Comment{}
 	err := r.collection.FindOne(ctx, bson.M{"id": id}).Decode(entity)
 	if err != nil {
@@ -43,7 +43,7 @@ func (r CommentRepository) Get(ctx context.Context, id string) (*comment.Comment
 }
 
 // Query retrieves records with the specified offset and limit from the database.
-func (r CommentRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]comment.Comment, error) {
+func (r *CommentRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]comment.Comment, error) {
 	items := []comment.Comment{}
 	var err error
 	condition := mongoutil.QueryWhereCondition(cond.Where)
@@ -69,7 +69,7 @@ func (r CommentRepository) Query(ctx context.Context, cond domain.DBQueryConditi
 
 // Create saves a new album record in the database.
 // It returns the ID of the newly inserted album record.
-func (r CommentRepository) Create(ctx context.Context, entity *comment.Comment) error {
+func (r *CommentRepository) Create(ctx context.Context, entity *comment.Comment) error {
 	if entity.ID != "" {
 		return errors.Wrap(apperror.ErrBadRequest, "entity is not new")
 	}
@@ -84,7 +84,7 @@ func (r CommentRepository) Create(ctx context.Context, entity *comment.Comment) 
 	return nil
 }
 
-func (r CommentRepository) Update(ctx context.Context, entity *comment.Comment) error {
+func (r *CommentRepository) Update(ctx context.Context, entity *comment.Comment) error {
 	if entity.ID == "" {
 		return errors.Wrap(apperror.ErrBadRequest, "entity is new")
 	}
@@ -102,7 +102,7 @@ func (r CommentRepository) Update(ctx context.Context, entity *comment.Comment) 
 }
 
 // Delete deletes an entity with the specified ID from the database.
-func (r CommentRepository) Delete(ctx context.Context, id string) error {
+func (r *CommentRepository) Delete(ctx context.Context, id string) error {
 	res, err := r.collection.DeleteOne(ctx, bson.M{"id": id})
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

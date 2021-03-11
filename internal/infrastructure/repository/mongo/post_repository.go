@@ -36,7 +36,7 @@ func NewPostRepository(repository *repository, commentRepository *CommentReposit
 }
 
 // Get reads the recordset with the specified ID from the database.
-func (r PostRepository) Get(ctx context.Context, id string) (*post.Post, error) {
+func (r *PostRepository) Get(ctx context.Context, id string) (*post.Post, error) {
 	entity := &post.Post{}
 	res := r.collection.FindOne(ctx, bson.M{"id": id})
 	err := res.Decode(entity)
@@ -55,7 +55,7 @@ func (r PostRepository) Get(ctx context.Context, id string) (*post.Post, error) 
 	return entity, err
 }
 
-func (r PostRepository) populate(ctx context.Context, item *post.Post) (err error) {
+func (r *PostRepository) populate(ctx context.Context, item *post.Post) (err error) {
 	commentCond := domain.DBQueryConditions{
 		Where: &comment.Comment{PostID: item.ID},
 	}
@@ -79,7 +79,7 @@ func (r PostRepository) populate(ctx context.Context, item *post.Post) (err erro
 }
 
 // Query retrieves records with the specified offset and limit from the database.
-func (r PostRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]post.Post, error) {
+func (r *PostRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]post.Post, error) {
 	var err error
 	items := []post.Post{}
 	condition := mongoutil.QueryWhereCondition(cond.Where)
@@ -108,7 +108,7 @@ func (r PostRepository) Query(ctx context.Context, cond domain.DBQueryConditions
 
 // Create saves a new album record in the database.
 // It returns the ID of the newly inserted album record.
-func (r PostRepository) Create(ctx context.Context, entity *post.Post) error {
+func (r *PostRepository) Create(ctx context.Context, entity *post.Post) error {
 	if entity.ID != "" {
 		return errors.Wrap(apperror.ErrBadRequest, "entity is not new")
 	}
@@ -123,7 +123,7 @@ func (r PostRepository) Create(ctx context.Context, entity *post.Post) error {
 	return nil
 }
 
-func (r PostRepository) Update(ctx context.Context, entity *post.Post) error {
+func (r *PostRepository) Update(ctx context.Context, entity *post.Post) error {
 	if entity.ID == "" {
 		return errors.Wrap(apperror.ErrBadRequest, "entity is new")
 	}
@@ -141,7 +141,7 @@ func (r PostRepository) Update(ctx context.Context, entity *post.Post) error {
 }
 
 // Delete deletes an entity with the specified ID from the database.
-func (r PostRepository) Delete(ctx context.Context, id string) error {
+func (r *PostRepository) Delete(ctx context.Context, id string) error {
 	res, err := r.collection.DeleteOne(ctx, bson.M{"id": id})
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

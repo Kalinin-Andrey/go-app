@@ -52,7 +52,7 @@ func (s *ApiTestSuite) TestPost_Create() {
 	assert.Equalf(expectedStatus, resp.StatusCode, "expected http status %v, got %v", expectedStatus, resp.StatusCode)
 
 	err = json.Unmarshal(resBody, &result)
-	require.NoErrorf(err, "can not unpack json, error: %v", err)
+	require.NoErrorf(err, "can not unpack json %q, error: %v", string(resBody), err)
 
 	jsonData, err := json.Marshal(expectedData)
 	json.Unmarshal(jsonData, &expected)

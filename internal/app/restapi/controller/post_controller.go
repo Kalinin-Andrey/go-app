@@ -58,7 +58,7 @@ func RegisterPostHandlers(r *routing.RouteGroup, service post.IService, userServ
 }
 
 // get method is for getting a one entity by ID
-func (c postController) get(ctx *routing.Context) error {
+func (c *postController) get(ctx *routing.Context) error {
 	id := ctx.Param("id")
 
 	entity, err := c.Service.Get(ctx.Request.Context(), id)
@@ -81,7 +81,7 @@ func (c postController) get(ctx *routing.Context) error {
 }
 
 // list method is for a getting a list of all entities
-func (c postController) list(ctx *routing.Context) error {
+func (c *postController) list(ctx *routing.Context) error {
 	rctx := ctx.Request.Context()
 
 	cond := domain.DBQueryConditions{
@@ -133,7 +133,7 @@ func (c postController) list(ctx *routing.Context) error {
 	return ctx.Write(items)
 }
 
-func (c postController) create(ctx *routing.Context) error {
+func (c *postController) create(ctx *routing.Context) error {
 	entity := c.Service.NewEntity()
 	if err := ctx.Read(entity); err != nil {
 		c.Logger.With(ctx.Request.Context()).Info(err)
@@ -157,7 +157,7 @@ func (c postController) create(ctx *routing.Context) error {
 	return ctx.WriteWithStatus(entity, http.StatusCreated)
 }
 
-func (c postController) delete(ctx *routing.Context) error {
+func (c *postController) delete(ctx *routing.Context) error {
 	id := ctx.Param("id")
 
 	if err := c.Service.Delete(ctx.Request.Context(), id); err != nil {
@@ -173,15 +173,15 @@ func (c postController) delete(ctx *routing.Context) error {
 	return ctx.WriteWithStatus(errorshandler.SuccessMessage(), http.StatusOK)
 }
 
-func (c postController) upvote(ctx *routing.Context) error {
+func (c *postController) upvote(ctx *routing.Context) error {
 	return c.vote(ctx, ctx.Param("postId"), 1)
 }
 
-func (c postController) downvote(ctx *routing.Context) error {
+func (c *postController) downvote(ctx *routing.Context) error {
 	return c.vote(ctx, ctx.Param("postId"), -1)
 }
 
-func (c postController) vote(ctx *routing.Context, postId string, val int) error {
+func (c *postController) vote(ctx *routing.Context, postId string, val int) error {
 	session := auth.CurrentSession(ctx.Request.Context())
 	entity := c.Service.NewVoteEntity(session.UserID, postId, val)
 	entity.User = session.User
@@ -205,7 +205,7 @@ func (c postController) vote(ctx *routing.Context, postId string, val int) error
 	return ctx.WriteWithStatus(post, http.StatusOK)
 }
 
-func (c postController) unvote(ctx *routing.Context) error {
+func (c *postController) unvote(ctx *routing.Context) error {
 	postId := ctx.Param("postId")
 	session := auth.CurrentSession(ctx.Request.Context())
 	entity := &vote.Vote{

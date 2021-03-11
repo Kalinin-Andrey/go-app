@@ -1,12 +1,13 @@
 package pg
 
 import (
-	"github.com/iancoleman/strcase"
-	"github.com/jinzhu/gorm"
-	"github.com/pkg/errors"
 	"redditclone/internal/domain"
 	"redditclone/internal/domain/user"
 	"strings"
+
+	"github.com/iancoleman/strcase"
+	"github.com/jinzhu/gorm"
+	"github.com/pkg/errors"
 
 	"github.com/minipkg/go-app-common/log"
 
@@ -49,12 +50,12 @@ func (r *repository) SetDefaultConditions(defaultConditions domain.DBQueryCondit
 	}
 }
 
-func (r repository) dbWithDefaults() *gorm.DB {
+func (r *repository) dbWithDefaults() *gorm.DB {
 	db, _ := r.applyConditions(r.db.DB(), r.Conditions)
 	return db
 }
 
-func (r repository) applyConditions(db *gorm.DB, conditions domain.DBQueryConditions) (*gorm.DB, error) {
+func (r *repository) applyConditions(db *gorm.DB, conditions domain.DBQueryConditions) (*gorm.DB, error) {
 
 	if err := conditions.Validate(); err != nil {
 		return nil, err
@@ -85,7 +86,7 @@ func (r repository) applyConditions(db *gorm.DB, conditions domain.DBQueryCondit
 	return db, nil
 }
 
-func (r repository) keysToSnakeCase(in map[string]interface{}) map[string]interface{} {
+func (r *repository) keysToSnakeCase(in map[string]interface{}) map[string]interface{} {
 	out := make(map[string]interface{}, len(in))
 
 	for key, val := range in {
@@ -94,7 +95,7 @@ func (r repository) keysToSnakeCase(in map[string]interface{}) map[string]interf
 	return out
 }
 
-func (r repository) keysToSnakeCaseStr(in map[string]string) map[string]string {
+func (r *repository) keysToSnakeCaseStr(in map[string]string) map[string]string {
 	out := make(map[string]string, len(in))
 
 	for key, val := range in {

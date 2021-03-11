@@ -62,12 +62,12 @@ func (m UserRepository) First(a0 context.Context, a1 *user.User) (*user.User, er
 	return r0, r1
 }
 
-func (m UserRepository) Query(a0 context.Context, a1, a2 uint) ([]user.User, error) {
-	ret := m.Called(a0, a1, a2)
+func (m UserRepository) Query(a0 context.Context, a1 domain.DBQueryConditions) ([]user.User, error) {
+	ret := m.Called(a0, a1)
 
 	var r0 []user.User
-	if rf, ok := ret.Get(0).(func(context.Context, uint, uint) []user.User); ok {
-		r0 = rf(a0, a1, a2)
+	if rf, ok := ret.Get(0).(func(context.Context, domain.DBQueryConditions) []user.User); ok {
+		r0 = rf(a0, a1)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]user.User)
@@ -75,8 +75,8 @@ func (m UserRepository) Query(a0 context.Context, a1, a2 uint) ([]user.User, err
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, uint, uint) error); ok {
-		r1 = rf(a0, a1, a2)
+	if rf, ok := ret.Get(1).(func(context.Context, domain.DBQueryConditions) error); ok {
+		r1 = rf(a0, a1)
 	} else {
 		r1 = ret.Error(1)
 	}

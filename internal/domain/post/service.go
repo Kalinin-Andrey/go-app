@@ -54,15 +54,15 @@ func NewService(logger log.ILogger, repo Repository, commentRepo comment.Reposit
 }
 
 // Defaults returns defaults params
-func (s service) defaultConditions() domain.DBQueryConditions {
+func (s *service) defaultConditions() domain.DBQueryConditions {
 	return domain.DBQueryConditions{}
 }
 
-func (s service) NewEntity() *Post {
+func (s *service) NewEntity() *Post {
 	return &Post{}
 }
 
-func (s service) NewVoteEntity(userId uint, postId string, val int) *vote.Vote {
+func (s *service) NewVoteEntity(userId uint, postId string, val int) *vote.Vote {
 	return &vote.Vote{
 		UserID: userId,
 		PostID: postId,
@@ -71,7 +71,7 @@ func (s service) NewVoteEntity(userId uint, postId string, val int) *vote.Vote {
 }
 
 // Get returns the entity with the specified ID.
-func (s service) Get(ctx context.Context, id string) (*Post, error) {
+func (s *service) Get(ctx context.Context, id string) (*Post, error) {
 	entity, err := s.repository.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -81,12 +81,12 @@ func (s service) Get(ctx context.Context, id string) (*Post, error) {
 
 /*
 // Count returns the number of items.
-func (s service) Count(ctx context.Context) (uint, error) {
+func (s *service) Count(ctx context.Context) (uint, error) {
 	return s.repository.Count(ctx)
 }*/
 
 // Query returns the items with the specified offset and limit.
-func (s service) Query(ctx context.Context, query domain.DBQueryConditions) ([]Post, error) {
+func (s *service) Query(ctx context.Context, query domain.DBQueryConditions) ([]Post, error) {
 	items, err := s.repository.Query(ctx, query)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of posts by query: %v", query)
@@ -95,7 +95,7 @@ func (s service) Query(ctx context.Context, query domain.DBQueryConditions) ([]P
 }
 
 // List returns the items list.
-func (s service) List(ctx context.Context) ([]Post, error) {
+func (s *service) List(ctx context.Context) ([]Post, error) {
 	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of posts by ctx")
@@ -103,20 +103,20 @@ func (s service) List(ctx context.Context) ([]Post, error) {
 	return items, nil
 }
 
-func (s service) Create(ctx context.Context, entity *Post) error {
+func (s *service) Create(ctx context.Context, entity *Post) error {
 	return s.repository.Create(ctx, entity)
 }
 
-func (s service) ViewsIncr(ctx context.Context, entity *Post) error {
+func (s *service) ViewsIncr(ctx context.Context, entity *Post) error {
 	entity.Views++
 	return s.repository.Update(ctx, entity)
 }
 
-func (s service) Delete(ctx context.Context, id string) error {
+func (s *service) Delete(ctx context.Context, id string) error {
 	return s.repository.Delete(ctx, id)
 }
 
-func (s service) Vote(ctx context.Context, entity *vote.Vote) (err error) {
+func (s *service) Vote(ctx context.Context, entity *vote.Vote) (err error) {
 	item := &vote.Vote{
 		PostID: entity.PostID,
 		UserID: entity.UserID,
@@ -141,7 +141,7 @@ func (s service) Vote(ctx context.Context, entity *vote.Vote) (err error) {
 	return s.PostChangeScore(ctx, entity.PostID, 2*entity.Value)
 }
 
-func (s service) Unvote(ctx context.Context, entity *vote.Vote) (err error) {
+func (s *service) Unvote(ctx context.Context, entity *vote.Vote) (err error) {
 	item := &vote.Vote{
 		PostID: entity.PostID,
 		UserID: entity.UserID,
@@ -160,7 +160,7 @@ func (s service) Unvote(ctx context.Context, entity *vote.Vote) (err error) {
 	return s.PostChangeScore(ctx, entity.PostID, -1*entity.Value)
 }
 
-func (s service) PostChangeScore(ctx context.Context, id string, diff int) error {
+func (s *service) PostChangeScore(ctx context.Context, id string, diff int) error {
 	entity, err := s.repository.Get(ctx, id)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
