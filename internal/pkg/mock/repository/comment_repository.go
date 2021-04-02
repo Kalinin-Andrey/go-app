@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
+	"github.com/minipkg/selection_condition"
 	"github.com/stretchr/testify/mock"
 
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"
 )
 
@@ -16,7 +16,7 @@ type CommentRepository struct {
 
 var _ comment.Repository = (*CommentRepository)(nil)
 
-func (m CommentRepository) SetDefaultConditions(conditions domain.DBQueryConditions) {}
+func (m CommentRepository) SetDefaultConditions(conditions selection_condition.SelectionCondition) {}
 
 func (m CommentRepository) Get(a0 context.Context, a1 string) (*comment.Comment, error) {
 	ret := m.Called(a0, a1)
@@ -40,11 +40,11 @@ func (m CommentRepository) Get(a0 context.Context, a1 string) (*comment.Comment,
 	return r0, r1
 }
 
-func (m CommentRepository) Query(a0 context.Context, a1 domain.DBQueryConditions) ([]comment.Comment, error) {
+func (m CommentRepository) Query(a0 context.Context, a1 selection_condition.SelectionCondition) ([]comment.Comment, error) {
 	ret := m.Called(a0, a1)
 
 	var r0 []comment.Comment
-	if rf, ok := ret.Get(0).(func(context.Context, domain.DBQueryConditions) []comment.Comment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, selection_condition.SelectionCondition) []comment.Comment); ok {
 		r0 = rf(a0, a1)
 	} else {
 		if ret.Get(0) != nil {
@@ -53,7 +53,7 @@ func (m CommentRepository) Query(a0 context.Context, a1 domain.DBQueryConditions
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.DBQueryConditions) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, selection_condition.SelectionCondition) error); ok {
 		r1 = rf(a0, a1)
 	} else {
 		r1 = ret.Error(1)

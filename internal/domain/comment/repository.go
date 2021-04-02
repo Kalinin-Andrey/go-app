@@ -2,7 +2,8 @@ package comment
 
 import (
 	"context"
-	"redditclone/internal/domain"
+
+	"github.com/minipkg/selection_condition"
 )
 
 // Repository encapsulates the logic to access albums from the data source.
@@ -12,8 +13,8 @@ type Repository interface {
 	// Count returns the number of albums.
 	//Count(ctx context.Context) (uint, error)
 	// Query returns the list of albums with the given offset and limit.
-	Query(ctx context.Context, cond domain.DBQueryConditions) ([]Comment, error)
-	SetDefaultConditions(conditions domain.DBQueryConditions)
+	Query(ctx context.Context, cond selection_condition.SelectionCondition) ([]Comment, error)
+	SetDefaultConditions(conditions selection_condition.SelectionCondition)
 	// Create saves a new album in the storage.
 	Create(ctx context.Context, entity *Comment) error
 	// Update updates the album with given ID in the storage.

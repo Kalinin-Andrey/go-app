@@ -61,7 +61,7 @@ func (r UserRepository) First(ctx context.Context, entity *user.User) (*user.Use
 func (r UserRepository) Query(ctx context.Context, cond *selection_condition.SelectionCondition) ([]user.User, error) {
 	items := []user.User{}
 
-	db := minipkg_gorm.Conditions(r.DB(), cond)
+	db := minipkg_gorm.Conditions(r.DB().Model(&user.User{}), cond)
 	if db.Error != nil {
 		return nil, db.Error
 	}

@@ -6,9 +6,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/minipkg/log"
+	"github.com/minipkg/selection_condition"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/vote"
 	"redditclone/internal/pkg/apperror"
@@ -22,7 +22,7 @@ type IService interface {
 	NewVoteEntity(userId uint, postId string, val int) *vote.Vote
 	Get(ctx context.Context, id string) (*Post, error)
 	//First(ctx context.Context, user *Post) (*Post, error)
-	Query(ctx context.Context, query domain.DBQueryConditions) ([]Post, error)
+	Query(ctx context.Context, query selection_condition.SelectionCondition) ([]Post, error)
 	List(ctx context.Context) ([]Post, error)
 	//Count(ctx context.Context) (uint, error)
 	Create(ctx context.Context, entity *Post) error
@@ -54,8 +54,8 @@ func NewService(logger log.ILogger, repo Repository, commentRepo comment.Reposit
 }
 
 // Defaults returns defaults params
-func (s *service) defaultConditions() domain.DBQueryConditions {
-	return domain.DBQueryConditions{}
+func (s *service) defaultConditions() selection_condition.SelectionCondition {
+	return selection_condition.SelectionCondition{}
 }
 
 func (s *service) NewEntity() *Post {
@@ -86,7 +86,7 @@ func (s *service) Count(ctx context.Context) (uint, error) {
 }*/
 
 // Query returns the items with the specified offset and limit.
-func (s *service) Query(ctx context.Context, query domain.DBQueryConditions) ([]Post, error) {
+func (s *service) Query(ctx context.Context, query selection_condition.SelectionCondition) ([]Post, error) {
 	items, err := s.repository.Query(ctx, query)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of posts by query: %v", query)
@@ -96,7 +96,7 @@ func (s *service) Query(ctx context.Context, query domain.DBQueryConditions) ([]
 
 // List returns the items list.
 func (s *service) List(ctx context.Context) ([]Post, error) {
-	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
+	items, err := s.repository.Query(ctx, selection_condition.SelectionCondition{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of posts by ctx")
 	}

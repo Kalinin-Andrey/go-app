@@ -7,12 +7,12 @@ import (
 
 	"github.com/google/uuid"
 	minipkg_mongo "github.com/minipkg/db/mongo"
+	"github.com/minipkg/selection_condition"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"redditclone/internal/pkg/apperror"
 
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"
 )
 
@@ -43,7 +43,7 @@ func (r *CommentRepository) Get(ctx context.Context, id string) (*comment.Commen
 }
 
 // Query retrieves records with the specified offset and limit from the database.
-func (r *CommentRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]comment.Comment, error) {
+func (r *CommentRepository) Query(ctx context.Context, cond selection_condition.SelectionCondition) ([]comment.Comment, error) {
 	items := []comment.Comment{}
 	var err error
 	condition := minipkg_mongo.QueryWhereCondition(cond.Where)

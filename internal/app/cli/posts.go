@@ -3,9 +3,10 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/spf13/cobra"
-	"redditclone/internal/domain"
 	"redditclone/internal/pkg/apperror"
+
+	"github.com/minipkg/selection_condition"
+	"github.com/spf13/cobra"
 )
 
 // statusCmd represents the status command
@@ -16,7 +17,7 @@ var postsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("posts called")
 		ctx := context.Background()
-		items, err := app.Domain.Post.Service.Query(ctx, domain.DBQueryConditions{})
+		items, err := app.Domain.Post.Service.Query(ctx, selection_condition.SelectionCondition{})
 		if err != nil {
 			if err == apperror.ErrNotFound {
 				app.Logger.With(ctx).Info(err)

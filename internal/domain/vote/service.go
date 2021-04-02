@@ -2,9 +2,9 @@ package vote
 
 import (
 	"context"
-	"redditclone/internal/domain"
 
 	"github.com/minipkg/log"
+	"github.com/minipkg/selection_condition"
 	"github.com/pkg/errors"
 )
 
@@ -40,8 +40,8 @@ func NewService(logger log.ILogger, repo Repository) IService {
 }
 
 // Defaults returns defaults params
-func (s *service) defaultConditions() domain.DBQueryConditions {
-	return domain.DBQueryConditions{}
+func (s *service) defaultConditions() selection_condition.SelectionCondition {
+	return selection_condition.SelectionCondition{}
 }
 
 func (s *service) NewEntity(userId uint, postId string, val int) *Vote {
@@ -69,7 +69,7 @@ func (s *service) Count(ctx context.Context) (uint, error) {
 
 // Query returns the items with the specified offset and limit.
 func (s *service) Query(ctx context.Context, offset, limit uint) ([]Vote, error) {
-	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
+	items, err := s.repository.Query(ctx, selection_condition.SelectionCondition{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of votes by ctx")
 	}
@@ -78,7 +78,7 @@ func (s *service) Query(ctx context.Context, offset, limit uint) ([]Vote, error)
 
 // List returns the items list.
 func (s *service) List(ctx context.Context) ([]Vote, error) {
-	items, err := s.repository.Query(ctx, domain.DBQueryConditions{})
+	items, err := s.repository.Query(ctx, selection_condition.SelectionCondition{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Can not find a list of votes by ctx")
 	}

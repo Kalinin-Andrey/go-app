@@ -7,12 +7,12 @@ import (
 
 	"github.com/google/uuid"
 	minipkg_mongo "github.com/minipkg/db/mongo"
+	"github.com/minipkg/selection_condition"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"redditclone/internal/pkg/apperror"
 
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/vote"
 )
 
@@ -43,7 +43,7 @@ func (r *VoteRepository) Get(ctx context.Context, id string) (*vote.Vote, error)
 }
 
 // Query retrieves records with the specified offset and limit from the database.
-func (r *VoteRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]vote.Vote, error) {
+func (r *VoteRepository) Query(ctx context.Context, cond selection_condition.SelectionCondition) ([]vote.Vote, error) {
 	items := []vote.Vote{}
 	var err error
 	condition := minipkg_mongo.QueryWhereCondition(cond.Where)

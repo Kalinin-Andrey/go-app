@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/post"
 	"redditclone/internal/domain/user"
 	"redditclone/internal/domain/vote"
 	"redditclone/internal/pkg/apperror"
 	"redditclone/internal/pkg/errorshandler"
 
+	"github.com/minipkg/selection_condition"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -145,11 +145,8 @@ func (s *ApiTestSuite) TestPost_List() {
 	s.setupSession()
 
 	list := []post.Post{*s.entities.post}
-	query := domain.DBQueryConditions{
+	query := selection_condition.SelectionCondition{
 		Where: &post.Post{},
-		SortOrder: map[string]string{
-			"id": "asc",
-		},
 	}
 
 	s.repositoryMocks.post.On("Query", mock.Anything, query).Return(list, error(nil))
@@ -186,12 +183,9 @@ func (s *ApiTestSuite) TestPost_ListByCategory() {
 	s.setupSession()
 
 	list := []post.Post{*s.entities.post}
-	query := domain.DBQueryConditions{
+	query := selection_condition.SelectionCondition{
 		Where: &post.Post{
 			Category: "category",
-		},
-		SortOrder: map[string]string{
-			"id": "asc",
 		},
 	}
 
@@ -232,12 +226,9 @@ func (s *ApiTestSuite) TestPost_ListByUser() {
 	searchedUser := &user.User{
 		Name: s.entities.user.Name,
 	}
-	query := domain.DBQueryConditions{
+	query := selection_condition.SelectionCondition{
 		Where: &post.Post{
 			UserID: s.entities.user.ID,
-		},
-		SortOrder: map[string]string{
-			"id": "asc",
 		},
 	}
 

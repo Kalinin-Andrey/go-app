@@ -16,8 +16,8 @@ import (
 
 	dbmockmongo "github.com/minipkg/db/mongo/mock"
 	"github.com/minipkg/log"
+	"github.com/minipkg/selection_condition"
 
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/post"
 	"redditclone/internal/domain/vote"
@@ -104,7 +104,7 @@ func (s *VoteRepositoryTestSuite) TestQuery() {
 	cursor := &dbmockmongo.Cursor{
 		Res: items,
 	}
-	condition := domain.DBQueryConditions{
+	condition := selection_condition.SelectionCondition{
 		Where: &vote.Vote{
 			PostID: s.vote.PostID,
 		},

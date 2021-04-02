@@ -5,8 +5,8 @@ import (
 
 	mongodb "github.com/minipkg/db/mongo"
 	"github.com/minipkg/log"
+	"github.com/minipkg/selection_condition"
 
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/post"
 	"redditclone/internal/domain/vote"
@@ -18,7 +18,7 @@ type IRepository interface{}
 // repository persists albums in database
 type repository struct {
 	logger     log.ILogger
-	Conditions domain.DBQueryConditions
+	Conditions selection_condition.SelectionCondition
 	db         mongodb.IDB
 	collection mongodb.ICollection
 }
@@ -67,7 +67,7 @@ func GetRepository(logger log.ILogger, db mongodb.IDB, entity string) (repo IRep
 	return repo, err
 }
 
-func (r *repository) SetDefaultConditions(defaultConditions domain.DBQueryConditions) {
+func (r *repository) SetDefaultConditions(defaultConditions selection_condition.SelectionCondition) {
 	r.Conditions = defaultConditions
 
 	if r.Conditions.Limit == 0 {

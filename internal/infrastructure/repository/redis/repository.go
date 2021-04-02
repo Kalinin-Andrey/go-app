@@ -1,9 +1,8 @@
 package redis
 
 import (
-	"redditclone/internal/domain"
-
 	"github.com/minipkg/db/redis"
+	"github.com/minipkg/selection_condition"
 )
 
 // IRepository is an interface of repository
@@ -12,12 +11,12 @@ type IRepository interface{}
 // repository persists albums in database
 type repository struct {
 	db         redis.IDB
-	Conditions domain.DBQueryConditions
+	Conditions selection_condition.SelectionCondition
 }
 
 const DefaultLimit = 100
 
-func (r *repository) SetDefaultConditions(defaultConditions domain.DBQueryConditions) {
+func (r *repository) SetDefaultConditions(defaultConditions selection_condition.SelectionCondition) {
 	r.Conditions = defaultConditions
 
 	if r.Conditions.Limit == 0 {

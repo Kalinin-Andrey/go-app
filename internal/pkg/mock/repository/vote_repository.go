@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
+	"github.com/minipkg/selection_condition"
 	"github.com/stretchr/testify/mock"
 
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/vote"
 )
 
@@ -16,7 +16,7 @@ type VoteRepository struct {
 
 var _ vote.Repository = (*VoteRepository)(nil)
 
-func (m VoteRepository) SetDefaultConditions(conditions domain.DBQueryConditions) {}
+func (m VoteRepository) SetDefaultConditions(conditions selection_condition.SelectionCondition) {}
 
 func (m VoteRepository) Get(a0 context.Context, a1 string) (*vote.Vote, error) {
 	ret := m.Called(a0, a1)
@@ -40,11 +40,11 @@ func (m VoteRepository) Get(a0 context.Context, a1 string) (*vote.Vote, error) {
 	return r0, r1
 }
 
-func (m VoteRepository) Query(a0 context.Context, a1 domain.DBQueryConditions) ([]vote.Vote, error) {
+func (m VoteRepository) Query(a0 context.Context, a1 selection_condition.SelectionCondition) ([]vote.Vote, error) {
 	ret := m.Called(a0, a1)
 
 	var r0 []vote.Vote
-	if rf, ok := ret.Get(0).(func(context.Context, domain.DBQueryConditions) []vote.Vote); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, selection_condition.SelectionCondition) []vote.Vote); ok {
 		r0 = rf(a0, a1)
 	} else {
 		if ret.Get(0) != nil {
@@ -53,7 +53,7 @@ func (m VoteRepository) Query(a0 context.Context, a1 domain.DBQueryConditions) (
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.DBQueryConditions) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, selection_condition.SelectionCondition) error); ok {
 		r1 = rf(a0, a1)
 	} else {
 		r1 = ret.Error(1)

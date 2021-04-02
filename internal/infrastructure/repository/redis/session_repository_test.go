@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"encoding/hex"
-	"redditclone/internal/domain"
 	"redditclone/internal/pkg/session"
 	"testing"
 	"time"
@@ -17,6 +16,7 @@ import (
 
 	dbredis "github.com/minipkg/db/redis"
 	dbmockredis "github.com/minipkg/db/redis/mock"
+	"github.com/minipkg/selection_condition"
 
 	"redditclone/internal/domain/user"
 )
@@ -41,11 +41,11 @@ type userRepoMock struct {
 
 var _ user.Repository = (*userRepoMock)(nil)
 
-func (m *userRepoMock) SetDefaultConditions(conditions domain.DBQueryConditions) {
+func (m *userRepoMock) SetDefaultConditions(conditions *selection_condition.SelectionCondition) {
 
 }
 
-func (m *userRepoMock) Query(ctx context.Context, cond domain.DBQueryConditions) ([]user.User, error) {
+func (m *userRepoMock) Query(ctx context.Context, cond *selection_condition.SelectionCondition) ([]user.User, error) {
 	return nil, nil
 }
 

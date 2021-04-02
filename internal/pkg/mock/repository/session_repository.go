@@ -3,12 +3,11 @@ package repository
 import (
 	"context"
 
+	"github.com/minipkg/selection_condition"
 	"github.com/stretchr/testify/mock"
 
 	"redditclone/internal/pkg/auth"
 	"redditclone/internal/pkg/session"
-
-	"redditclone/internal/domain"
 )
 
 // SessionRepository is a mock for SessionRepository
@@ -18,7 +17,8 @@ type SessionRepository struct {
 
 var _ auth.SessionRepository = (*SessionRepository)(nil)
 
-func (m SessionRepository) SetDefaultConditions(defaultConditions domain.DBQueryConditions) {}
+func (m SessionRepository) SetDefaultConditions(defaultConditions selection_condition.SelectionCondition) {
+}
 
 func (m SessionRepository) NewEntity(a0 context.Context, a1 uint) (*session.Session, error) {
 	ret := m.Called(a0, a1)

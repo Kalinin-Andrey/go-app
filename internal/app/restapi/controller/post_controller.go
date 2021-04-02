@@ -2,8 +2,8 @@ package controller
 
 import (
 	"net/http"
-	"redditclone/internal/domain"
 
+	"github.com/minipkg/selection_condition"
 	"github.com/pkg/errors"
 
 	routing "github.com/go-ozzo/ozzo-routing/v2"
@@ -83,12 +83,6 @@ func (c *postController) get(ctx *routing.Context) error {
 // list method is for a getting a list of all entities
 func (c *postController) list(ctx *routing.Context) error {
 	rctx := ctx.Request.Context()
-
-	cond := domain.DBQueryConditions{
-		SortOrder: map[string]string{
-			"id": "asc",
-		},
-	}
 	where := c.Service.NewEntity()
 
 	if len(ctx.Request.URL.Query()) > 0 {
@@ -118,7 +112,9 @@ func (c *postController) list(ctx *routing.Context) error {
 		}
 		where.UserID = user.ID
 	}
-	cond.Where = where
+	cond := selection_condition.SelectionCondition{
+		Where: where,
+	}
 
 	items, err := c.Service.Query(rctx, cond)
 	if err != nil {
