@@ -1,29 +1,26 @@
 package controller
 
 import (
-	"strconv"
+	"redditclone/internal/domain/user"
+	"redditclone/internal/pkg/apperror"
+
+	"github.com/minipkg/log"
+	ozzo_routing "github.com/minipkg/ozzo_routing"
+	"github.com/minipkg/ozzo_routing/errorshandler"
 
 	routing "github.com/go-ozzo/ozzo-routing/v2"
-	"github.com/pkg/errors"
-
-	"github.com/minipkg/go-app-common/log"
-
-	"redditclone/internal/pkg/apperror"
-	"redditclone/internal/pkg/errorshandler"
-
-	"redditclone/internal/domain/user"
 )
 
 type userController struct {
-	Service user.IService
 	Logger  log.ILogger
+	Service user.IService
 }
 
 // RegisterHandlers sets up the routing of the HTTP handlers.
 func RegisterUserHandlers(r *routing.RouteGroup, service user.IService, logger log.ILogger, authHandler routing.Handler) {
 	c := userController{
-		Service: service,
 		Logger:  logger,
+		Service: service,
 	}
 
 	r.Get(`/user/<id:\d+>`, c.get)
@@ -32,12 +29,12 @@ func RegisterUserHandlers(r *routing.RouteGroup, service user.IService, logger l
 }
 
 // get method is for a getting a one enmtity by ID
-func (c *userController) get(ctx *routing.Context) error {
-	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+func (c userController) get(ctx *routing.Context) error {
+	id, err := ozzo_routing.ParseUintParam(ctx, "id")
 	if err != nil {
-		c.Logger.With(ctx.Request.Context()).Info(errors.Wrapf(err, "Can not parse uint64 from %q", ctx.Param("id")))
-		return errorshandler.BadRequest("id mast be a uint")
+		return errorshandler.BadRequest("ID is required to be uint")
 	}
+
 	entity, err := c.Service.Get(ctx.Request.Context(), uint(id))
 	if err != nil {
 		if err == apperror.ErrNotFound {
@@ -47,12 +44,11 @@ func (c *userController) get(ctx *routing.Context) error {
 		c.Logger.With(ctx.Request.Context()).Error(err)
 		return errorshandler.InternalServerError("")
 	}
-	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return ctx.Write(entity)
 }
 
 // list method is for a getting a list of all entities
-/*func (c *userController) list(ctx *routing.Context) error {
+/*func (c userController) list(ctx *routing.Context) error {
 	rctx := ctx.Request.Context()
 	items, err := c.Service.List(rctx)
 	if err != nil {
@@ -63,6 +59,5 @@ func (c *userController) get(ctx *routing.Context) error {
 		c.Logger.With(ctx.Request.Context()).Error(err)
 		return errorshandler.InternalServerError("")
 	}
-	ctx.Response.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	return ctx.Write(items)
 }*/

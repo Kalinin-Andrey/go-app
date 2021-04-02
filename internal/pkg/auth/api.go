@@ -3,12 +3,13 @@ package auth
 import (
 	"net/http"
 
-	"github.com/go-ozzo/ozzo-routing/v2"
-	"github.com/go-ozzo/ozzo-validation/v4"
+	routing "github.com/go-ozzo/ozzo-routing/v2"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 
-	"github.com/minipkg/go-app-common/log"
 	"redditclone/internal/pkg/errorshandler"
+
+	"github.com/minipkg/log"
 )
 
 type identity struct {

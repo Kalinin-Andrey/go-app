@@ -4,7 +4,7 @@ import (
 	"context"
 	"redditclone/internal/domain"
 
-	"github.com/minipkg/go-app-common/log"
+	"github.com/minipkg/log"
 	"github.com/pkg/errors"
 )
 

@@ -1,17 +1,15 @@
 package pg
 
 import (
-	"redditclone/internal/domain"
 	"redditclone/internal/domain/user"
-	"strings"
 
-	"github.com/iancoleman/strcase"
+	minipkg_gorm "github.com/minipkg/db/gorm"
+	"github.com/minipkg/selection_condition"
+
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 
-	"github.com/minipkg/go-app-common/log"
-
-	"github.com/minipkg/go-app-common/db/pg"
+	"github.com/minipkg/log"
 )
 
 // IRepository is an interface of repository
@@ -19,15 +17,15 @@ type IRepository interface{}
 
 // repository persists albums in database
 type repository struct {
-	db         pg.IDB
+	db         minipkg_gorm.IDB
 	logger     log.ILogger
-	Conditions domain.DBQueryConditions
+	Conditions *selection_condition.SelectionCondition
 }
 
-const DefaultLimit = 100
+const DefaultLimit = 1000
 
 // GetRepository return a repository
-func GetRepository(logger log.ILogger, dbase pg.IDB, entity string) (repo IRepository, err error) {
+func GetRepository(logger log.ILogger, dbase minipkg_gorm.IDB, entity string) (repo IRepository, err error) {
 	r := &repository{
 		db:     dbase,
 		logger: logger,
@@ -42,64 +40,10 @@ func GetRepository(logger log.ILogger, dbase pg.IDB, entity string) (repo IRepos
 	return repo, err
 }
 
-func (r *repository) SetDefaultConditions(defaultConditions domain.DBQueryConditions) {
+func (r *repository) SetDefaultConditions(defaultConditions *selection_condition.SelectionCondition) {
 	r.Conditions = defaultConditions
-
-	if r.Conditions.Limit == 0 {
-		r.Conditions.Limit = DefaultLimit
-	}
 }
 
-func (r *repository) dbWithDefaults() *gorm.DB {
-	db, _ := r.applyConditions(r.db.DB(), r.Conditions)
-	return db
-}
-
-func (r *repository) applyConditions(db *gorm.DB, conditions domain.DBQueryConditions) (*gorm.DB, error) {
-
-	if err := conditions.Validate(); err != nil {
-		return nil, err
-	}
-
-	if conditions.Where != nil {
-		db = db.Where(conditions.Where)
-	}
-
-	if conditions.SortOrder != nil {
-		m := r.keysToSnakeCaseStr(conditions.SortOrder)
-		s := strings.Builder{}
-
-		for k, v := range m {
-			s.WriteString(k + " " + v + ", ")
-		}
-		db = db.Order(strings.Trim(s.String(), ", "))
-	}
-
-	if conditions.Limit != 0 {
-		db = db.Limit(conditions.Limit)
-	}
-
-	if conditions.Offset != 0 {
-		db = db.Limit(conditions.Offset)
-	}
-
-	return db, nil
-}
-
-func (r *repository) keysToSnakeCase(in map[string]interface{}) map[string]interface{} {
-	out := make(map[string]interface{}, len(in))
-
-	for key, val := range in {
-		out[strcase.ToSnake(key)] = val
-	}
-	return out
-}
-
-func (r *repository) keysToSnakeCaseStr(in map[string]string) map[string]string {
-	out := make(map[string]string, len(in))
-
-	for key, val := range in {
-		out[strcase.ToSnake(key)] = val
-	}
-	return out
+func (r repository) DB() *gorm.DB {
+	return minipkg_gorm.Conditions(r.db.DB(), r.Conditions)
 }

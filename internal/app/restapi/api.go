@@ -15,7 +15,7 @@ import (
 	"redditclone/internal/pkg/config"
 	"redditclone/internal/pkg/errorshandler"
 
-	"github.com/minipkg/go-app-common/accesslog"
+	"github.com/minipkg/log/accesslog"
 
 	commonApp "redditclone/internal/app"
 	"redditclone/internal/app/restapi/controller"

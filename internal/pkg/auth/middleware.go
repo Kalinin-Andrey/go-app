@@ -2,11 +2,12 @@ package auth
 
 import (
 	"context"
-	routing "github.com/go-ozzo/ozzo-routing/v2"
-	"github.com/minipkg/go-app-common/log"
 	"net/http"
 	"redditclone/internal/pkg/session"
 	"strings"
+
+	routing "github.com/go-ozzo/ozzo-routing/v2"
+	"github.com/minipkg/log"
 )
 
 // Middleware returns a JWT-based authentication middleware.

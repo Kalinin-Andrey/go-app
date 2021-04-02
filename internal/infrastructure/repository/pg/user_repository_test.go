@@ -7,15 +7,17 @@ import (
 	"testing"
 	"time"
 
+	pg "github.com/minipkg/db/gorm"
+	"github.com/minipkg/db/gorm/mock"
+
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/minipkg/go-app-common/db/pg"
-	pgmock "github.com/minipkg/go-app-common/db/pg/mock"
-	"github.com/minipkg/go-app-common/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"redditclone/internal/pkg/config"
+
+	"github.com/minipkg/log"
 
 	"redditclone/internal/domain/user"
 )
@@ -60,7 +62,7 @@ func (s *UserRepositoryTestSuite) SetupTest() {
 	require := require.New(s.T())
 	s.ctx = context.Background()
 
-	pgDB, PgMock, err = pgmock.New(s.cfg.DB.Pg, s.logger)
+	pgDB, PgMock, err = mock.New(s.cfg.DB.Pg, s.logger)
 	require.NoError(err)
 	s.mock = *PgMock
 

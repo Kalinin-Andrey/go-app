@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	routing "github.com/go-ozzo/ozzo-routing/v2"
-	"github.com/minipkg/go-app-common/log"
+	"github.com/minipkg/log"
 
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/post"

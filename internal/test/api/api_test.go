@@ -18,7 +18,7 @@ import (
 	"redditclone/internal/pkg/jwt"
 	repositoryMock "redditclone/internal/pkg/mock/repository"
 
-	"github.com/minipkg/go-app-common/log"
+	"github.com/minipkg/log"
 
 	commonapp "redditclone/internal/app"
 	apiapp "redditclone/internal/app/restapi"

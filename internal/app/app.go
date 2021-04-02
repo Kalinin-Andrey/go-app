@@ -2,18 +2,20 @@ package app
 
 import (
 	"context"
-	"github.com/minipkg/go-app-common/log"
-	"github.com/pkg/errors"
 	golog "log"
 	"redditclone/internal/pkg/apperror"
 	"redditclone/internal/pkg/config"
 
-	"github.com/minipkg/go-app-common/db/mongo"
-	"github.com/minipkg/go-app-common/db/pg"
-	"github.com/minipkg/go-app-common/db/redis"
-	"github.com/minipkg/go-app-common/db/redis/cache"
+	"github.com/minipkg/log"
+	"github.com/pkg/errors"
+
 	"redditclone/internal/pkg/auth"
 	"redditclone/internal/pkg/jwt"
+
+	pg "github.com/minipkg/db/gorm"
+	"github.com/minipkg/db/mongo"
+	"github.com/minipkg/db/redis"
+	"github.com/minipkg/db/redis/cache"
 
 	"redditclone/internal/domain/comment"
 	"redditclone/internal/domain/post"

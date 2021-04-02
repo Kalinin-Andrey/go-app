@@ -5,14 +5,16 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
-	"github.com/pkg/errors"
-	"golang.org/x/crypto/pbkdf2"
 	"redditclone/internal/pkg/session"
 	"time"
 
-	"github.com/minipkg/go-app-common/log"
+	"github.com/pkg/errors"
+	"golang.org/x/crypto/pbkdf2"
+
 	"redditclone/internal/domain/user"
 	"redditclone/internal/pkg/errorshandler"
+
+	"github.com/minipkg/log"
 )
 
 // Service encapsulates the authentication logic.

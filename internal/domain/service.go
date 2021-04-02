@@ -1,9 +1,9 @@
 package domain
 
 import (
-	"github.com/go-ozzo/ozzo-validation/v4"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 
-	"github.com/minipkg/go-app-common/log"
+	"github.com/minipkg/log"
 )
 
 const (

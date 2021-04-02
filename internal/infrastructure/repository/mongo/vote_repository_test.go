@@ -12,9 +12,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	dbmockmongo "github.com/minipkg/go-app-common/db/mongo/mock"
-	"github.com/minipkg/go-app-common/log"
 	"redditclone/internal/pkg/config"
+
+	dbmockmongo "github.com/minipkg/db/mongo/mock"
+	"github.com/minipkg/log"
 
 	"redditclone/internal/domain"
 	"redditclone/internal/domain/comment"

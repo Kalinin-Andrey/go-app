@@ -5,10 +5,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/minipkg/go-app-common/db/mongo"
-	"github.com/minipkg/go-app-common/db/pg"
-	"github.com/minipkg/go-app-common/db/redis"
-	"github.com/minipkg/go-app-common/log"
+	pg "github.com/minipkg/db/gorm"
+	"github.com/minipkg/db/mongo"
+	"github.com/minipkg/db/redis"
+	"github.com/minipkg/log"
 
 	"github.com/spf13/viper"
 )

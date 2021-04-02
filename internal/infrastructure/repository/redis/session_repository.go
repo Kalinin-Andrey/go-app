@@ -14,7 +14,7 @@ import (
 	"redditclone/internal/pkg/auth"
 	"redditclone/internal/pkg/session"
 
-	"github.com/minipkg/go-app-common/db/redis"
+	"github.com/minipkg/db/redis"
 
 	"redditclone/internal/domain/user"
 )

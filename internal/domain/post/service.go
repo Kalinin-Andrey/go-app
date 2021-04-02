@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/minipkg/go-app-common/log"
+	"github.com/minipkg/log"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"redditclone/internal/domain"

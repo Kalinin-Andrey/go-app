@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/google/uuid"
-	mongoutil "github.com/minipkg/go-app-common/db/mongo/util"
+	minipkg_mongo "github.com/minipkg/db/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -82,7 +82,7 @@ func (r *PostRepository) populate(ctx context.Context, item *post.Post) (err err
 func (r *PostRepository) Query(ctx context.Context, cond domain.DBQueryConditions) ([]post.Post, error) {
 	var err error
 	items := []post.Post{}
-	condition := mongoutil.QueryWhereCondition(cond.Where)
+	condition := minipkg_mongo.QueryWhereCondition(cond.Where)
 
 	cursor, err := r.collection.Find(ctx, condition)
 	if err != nil {

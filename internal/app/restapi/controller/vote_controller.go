@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"github.com/go-ozzo/ozzo-routing/v2"
-	"github.com/minipkg/go-app-common/log"
 	"redditclone/internal/domain/post"
 	"redditclone/internal/domain/vote"
+
+	routing "github.com/go-ozzo/ozzo-routing/v2"
+	"github.com/minipkg/log"
 )
 
 type voteController struct {

@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 
 	routing "github.com/go-ozzo/ozzo-routing/v2"
-	"github.com/minipkg/go-app-common/log"
-	"github.com/minipkg/go-app-common/ozzo_handler"
+	"github.com/minipkg/log"
+	"github.com/minipkg/ozzo_routing"
 
 	"redditclone/internal/pkg/apperror"
 	"redditclone/internal/pkg/auth"
@@ -92,7 +92,7 @@ func (c *postController) list(ctx *routing.Context) error {
 	where := c.Service.NewEntity()
 
 	if len(ctx.Request.URL.Query()) > 0 {
-		err := ozzo_handler.ParseQueryParams(ctx, where)
+		err := ozzo_routing.ParseQueryParamsIntoStruct(ctx, where)
 		if err != nil {
 			c.Logger.With(ctx.Request.Context()).Info(err)
 			return errorshandler.BadRequest("")
