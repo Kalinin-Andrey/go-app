@@ -79,7 +79,7 @@ func New(cfg config.Configuration) *App {
 		golog.Fatal(err)
 	}
 
-	pgDB, err := pg.New(cfg.DB.Pg, logger)
+	pgDB, err := pg.New(logger, cfg.DB.Pg)
 	if err != nil {
 		golog.Fatal(err)
 	}
